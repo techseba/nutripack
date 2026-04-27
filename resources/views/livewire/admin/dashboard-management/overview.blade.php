@@ -643,17 +643,22 @@
 
             @forelse ($this->activityLogs as $activityLog)
                 <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-                <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
+                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
+                    </div>
+                    <p class="text-xs font-bold text-slate-900">{{ $activityLog->description }}</p>
+                    <p class="text-[10px] text-slate-500 mt-1">{{ $activityLog->causer->name }}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <img src="{{ asset('assets/logo.jpg') }}" class="w-4 h-4 rounded-full" alt="User">
+                        <span class="text-[10px] font-medium text-slate-400">{{ $activityLog->causer->name }}. •
+                            {{ $activityLog->created_at->diffForHumans() }}</span>
+                    </div>
                 </div>
-                <p class="text-xs font-bold text-slate-900">{{ $activityLog->description }}</p>
-                <p class="text-[10px] text-slate-500 mt-1">{{ $activityLog->causer->name }}</p>
-                <div class="flex items-center gap-2 mt-2">
-                    <img src="{{ asset('assets/logo.jpg') }}" class="w-4 h-4 rounded-full" alt="User">
-                    <span class="text-[10px] font-medium text-slate-400">{{ $activityLog->causer->name }}. • {{ $activityLog->created_at->diffForHumans() }}</span>
-                </div>
-            </div>
             @empty
-                <div>no</div>
+                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
+                    </div>
+                    <p class="text-xs font-bold text-slate-900">Activity log not found</p>
+                </div>
             @endforelse
 
         </div>
