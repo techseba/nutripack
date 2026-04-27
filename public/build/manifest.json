@@ -1,0 +1,21 @@
+{
+  "public/assets/fonts/DS-DIGIT.TTF": {
+    "file": "assets/DS-DIGIT-Bz4sH1xK.TTF",
+    "src": "public/assets/fonts/DS-DIGIT.TTF"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Co0zVLlS.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

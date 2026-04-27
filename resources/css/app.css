@@ -1,0 +1,328 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Carme', 'Inter', 'Poppins', 'Nunito', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    --color-accent: var(--color-neutral-800);
+    --color-accent-content: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
+/* CUSTOM CSS FOR ADMIN SIDE */
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 0px rgba(251, 191, 36, 0);
+        background-color: rgba(251, 191, 36, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+        background-color: rgba(251, 191, 36, 0.3);
+    }
+
+    100% {
+        box-shadow: 0 0 0px rgba(251, 191, 36, 0);
+        background-color: rgba(251, 191, 36, 0.15);
+    }
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+/* resources/css/app.css */
+.scrollbar-custom {
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: #3f3f46 #18181b;
+    /* thumb, track */
+
+    /* Chrome, Edge, Safari */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #3f3f46;
+    border-radius: 9999px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: #18181b;
+}
+
+
+
+
+
+/* CUSTOM CSS FOR FRONTEND SIDE */
+body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Hide scrollbar but allow scrolling */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+    font-family: 'Outfit', sans-serif;
+}
+
+.bg-lemon {
+    background-color: #F3ECD9;
+}
+
+@font-face {
+    font-family: DS-DIGIT;
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../../public/assets/fonts/DS-DIGIT.TTF") format("woff2");
+}
+
+.clock {
+    font-family: "Orbitron", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.marquee-track {
+    overflow: hidden;
+}
+
+.marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 12s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marquee-content {
+        animation: none;
+    }
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* .dark .glass {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+} */
+
+.gradient-text {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.animate-gradient-bg {
+    background: linear-gradient(-45deg, #f0fdf4, #fff7ed, #eff6ff, #fdf2f8);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, rgba(233, 231, 231, 0) 0%, rgba(196, 196, 196, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+}
+
+.btn-shine:hover::after {
+    left: 120%;
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* For Menu Page */
+
+.meal-image-zoom {
+    overflow: hidden;
+}
+
+.meal-image-zoom img {
+    transition: transform 0.5s ease;
+}
+
+.card-hover:hover .meal-image-zoom img {
+    transform: scale(1.1);
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* For Plan Page */
+
+.card-selection {
+    border-color: #dde0e4;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-selection:hover {
+    border-color: rgba(255, 105, 0, 0.4);
+    background: rgba(255, 237, 212, 0.2);
+    box-shadow: 0 20px 40px rgba(255, 237, 212, 0.5);
+    cursor: pointer;
+}
+
+.card-selection.selected {
+    border-color: #00bc7d;
+    background: rgba(16, 185, 129, 0.05);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+}
