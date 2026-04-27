@@ -29,6 +29,7 @@ trait Menus
     public $carbs;
     public $fat;
     public $fiber;
+    public $ingredients = [];
     public $price;
 
     /*
@@ -88,7 +89,7 @@ trait Menus
 
     public function show(int $id)
     {
-        $menu = Meal::findOrFail($id);
+        $menu = Meal::with('ingredients')->findOrFail($id);
 
         $this->image = $menu->image;
         $this->name = $menu->name;
@@ -99,6 +100,7 @@ trait Menus
         $this->carbs = $menu->carbs;
         $this->fat = $menu->fat;
         $this->fiber = $menu->fiber;
+        $this->ingredients = $menu->ingredients;
         $this->price = $menu->price;
 
         $this->dispatch('open-modal');

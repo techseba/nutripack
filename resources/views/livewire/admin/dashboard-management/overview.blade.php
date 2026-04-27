@@ -638,64 +638,62 @@
             <p class="text-xs text-slate-500 mt-1">Recent changes to plans & pricing.</p>
         </div>
 
-        <div
-  x-data="{
-    loading: false,
-    scrollTimeout: null,
-    checkScroll() {
-      if (this.loading) return;
-      const threshold = 200;
-      // check container scroll
-      const containerBottom = (this.$el.scrollTop + this.$el.clientHeight) >= (this.$el.scrollHeight - threshold);
-      // check window scroll as fallback
-      const windowBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - threshold);
-      if (containerBottom || windowBottom) {
-        this.loading = true;
-        $wire.loadMore().then(() => {
-          setTimeout(() => { this.loading = false }, 300);
-        }).catch(() => { this.loading = false });
-      }
-    }
-  }"
-  x-init="
-    const onScroll = () => {
-      if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => checkScroll(), 120);
-    };
-    // listen both container and window
-    $el.addEventListener('scroll', onScroll);
-    window.addEventListener('scroll', onScroll);
-    $el.__cleanup = () => {
-      $el.removeEventListener('scroll', onScroll);
-      window.removeEventListener('scroll', onScroll);
-    };
-  "
-  wire:poll.visible.5000ms="refreshLatest"
-  class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6"
->
-  {{-- আপনার আগের markup এখানে অপরিবর্তিত --}}
-  @forelse ($activities as $activity)
-    <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-      <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white"></div>
-      <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
-      <p class="text-[10px] text-slate-500 mt-1">{{ $activity->properties['describe'] ?? '-' }}</p>
-      <div class="flex items-center gap-2 mt-2">
-        <img src="{{ asset('assets/admin/user.png') }}" class="w-4 h-4 rounded-full" alt="User">
-        <span class="text-[10px] font-medium text-slate-400">{{ optional($activity->causer)->name ?? 'System' }} • {{ $activity->created_at->diffForHumans() }}</span>
-      </div>
-    </div>
-  @empty
-    <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-      <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white"></div>
-      <p class="text-xs font-bold text-slate-900">Activity log not found.</p>
-    </div>
-  @endforelse
+        <div x-data="{
+            loading: false,
+            scrollTimeout: null,
+            checkScroll() {
+                if (this.loading) return;
+                const threshold = 200;
+                // check container scroll
+                const containerBottom = (this.$el.scrollTop + this.$el.clientHeight) >= (this.$el.scrollHeight - threshold);
+                // check window scroll as fallback
+                const windowBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - threshold);
+                if (containerBottom || windowBottom) {
+                    this.loading = true;
+                    $wire.loadMore().then(() => {
+                        setTimeout(() => { this.loading = false }, 300);
+                    }).catch(() => { this.loading = false });
+                }
+            }
+        }" x-init="const onScroll = () => {
+            if (scrollTimeout) clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => checkScroll(), 120);
+        };
+        // listen both container and window
+        $el.addEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll);
+        $el.__cleanup = () => {
+            $el.removeEventListener('scroll', onScroll);
+            window.removeEventListener('scroll', onScroll);
+        };" wire:poll.visible.5000ms="refreshLatest"
+            class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6">
+            {{-- আপনার আগের markup এখানে অপরিবর্তিত --}}
+            @forelse ($activities as $activity)
+                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white">
+                    </div>
+                    <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
+                    <p class="text-[10px] text-slate-500 mt-1">{{ $activity->properties['describe'] ?? '-' }}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <img src="{{ asset('assets/admin/user.png') }}" class="w-4 h-4 rounded-full" alt="User">
+                        <span
+                            class="text-[10px] font-medium text-slate-400">{{ optional($activity->causer)->name ?? 'System' }}
+                            • {{ $activity->created_at->diffForHumans() }}</span>
+                    </div>
+                </div>
+            @empty
+                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
+                    </div>
+                    <p class="text-xs font-bold text-slate-900">Activity log not found.</p>
+                </div>
+            @endforelse
 
-  <div class="py-4 text-center">
-    <div wire:loading wire:target="loadMore,refreshLatest" class="text-sm text-slate-500">Loading...</div>
-    <div x-show="loading" class="text-sm text-slate-500">Loading more...</div>
-  </div>
-</div>
+            <div class="py-4 text-center">
+                <div wire:loading wire:target="loadMore,refreshLatest" class="text-sm text-slate-500">Loading...</div>
+                <div x-show="loading" class="text-sm text-slate-500">Loading more...</div>
+            </div>
+        </div>
 
 
 
