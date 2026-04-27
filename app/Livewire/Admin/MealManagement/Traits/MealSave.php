@@ -128,6 +128,8 @@ trait MealSave
             $meal->dietPlans()->sync($this->mealDietPlans);
             $meal->ingredients()->sync($this->mealIngredients);
 
+            activity()->causedBy(auth()->user())->withProperties(['describe'=> $meal->name . ' meal created successfully', 'ip'=>request()->ip()])->log('Meal created');
+
             // Notifying that a row has been successfully inserted into the database
             $this->dispatch('toast', message: ucfirst($this->subject) . ' created successfully', type: 'success');
         }

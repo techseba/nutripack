@@ -73,7 +73,7 @@
                         <a href="{{ route('admin.subscribers') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $this->subscriberCount }}</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ $subscriberCount }}</p>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">subscribers</p>
                 </div>
 
@@ -89,7 +89,7 @@
                         <a href="{{ route('admin.subscribers') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $this->subscriberCount }}</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ $subscriberCount }}</p>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">Active Plans</p>
                 </div>
 
@@ -105,7 +105,7 @@
                         <a href="{{ route('admin.meals') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $this->mealCount }}</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ $mealCount }}</p>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">Total Meals</p>
                 </div>
 
@@ -638,19 +638,79 @@
             <p class="text-xs text-slate-500 mt-1">Recent changes to plans & pricing.</p>
         </div>
 
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6">
-            {{-- @dd($this->activityLogs) --}}
+        <div
+  x-data="{
+    loading: false,
+    scrollTimeout: null,
+    checkScroll() {
+      if (this.loading) return;
+      const threshold = 200;
+      // check container scroll
+      const containerBottom = (this.$el.scrollTop + this.$el.clientHeight) >= (this.$el.scrollHeight - threshold);
+      // check window scroll as fallback
+      const windowBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - threshold);
+      if (containerBottom || windowBottom) {
+        this.loading = true;
+        $wire.loadMore().then(() => {
+          setTimeout(() => { this.loading = false }, 300);
+        }).catch(() => { this.loading = false });
+      }
+    }
+  }"
+  x-init="
+    const onScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => checkScroll(), 120);
+    };
+    // listen both container and window
+    $el.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
+    $el.__cleanup = () => {
+      $el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onScroll);
+    };
+  "
+  wire:poll.visible.5000ms="refreshLatest"
+  class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6"
+>
+  {{-- আপনার আগের markup এখানে অপরিবর্তিত --}}
+  @forelse ($activities as $activity)
+    <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+      <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white"></div>
+      <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
+      <p class="text-[10px] text-slate-500 mt-1">{{ $activity->properties['describe'] ?? '-' }}</p>
+      <div class="flex items-center gap-2 mt-2">
+        <img src="{{ asset('assets/admin/user.png') }}" class="w-4 h-4 rounded-full" alt="User">
+        <span class="text-[10px] font-medium text-slate-400">{{ optional($activity->causer)->name ?? 'System' }} • {{ $activity->created_at->diffForHumans() }}</span>
+      </div>
+    </div>
+  @empty
+    <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+      <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white"></div>
+      <p class="text-xs font-bold text-slate-900">Activity log not found</p>
+    </div>
+  @endforelse
 
-            @forelse ($this->activityLogs as $activityLog)
+  <div class="py-4 text-center">
+    <div wire:loading wire:target="loadMore,refreshLatest" class="text-sm text-slate-500">Loading...</div>
+    <div x-show="loading" class="text-sm text-slate-500">Loading more...</div>
+  </div>
+</div>
+
+
+
+
+        {{-- <div wire:poll.5000ms class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6">
+            @forelse ($activities as $activity)
                 <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
+                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white">
                     </div>
-                    <p class="text-xs font-bold text-slate-900">{{ $activityLog->description }}</p>
-                    <p class="text-[10px] text-slate-500 mt-1">{{ $activityLog->causer->name }}</p>
+                    <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
+                    <p class="text-[10px] text-slate-500 mt-1">{{ $activity->properties['describe'] ?? '-' }}</p>
                     <div class="flex items-center gap-2 mt-2">
-                        <img src="{{ asset('assets/logo.jpg') }}" class="w-4 h-4 rounded-full" alt="User">
-                        <span class="text-[10px] font-medium text-slate-400">{{ $activityLog->causer->name }}. •
-                            {{ $activityLog->created_at->diffForHumans() }}</span>
+                        <img src="{{ asset('assets/admin/user.png') }}" class="w-4 h-4 rounded-full" alt="User">
+                        <span class="text-[10px] font-medium text-slate-400">{{ $activity->causer->name }}. •
+                            {{ $activity->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
             @empty
@@ -660,8 +720,7 @@
                     <p class="text-xs font-bold text-slate-900">Activity log not found</p>
                 </div>
             @endforelse
-
-        </div>
+        </div> --}}
 
         <div class="fixed bottom-0 right-7.5 w-80 p-6">
             <div class="bg-white/10 backdrop-blur-xs border border-slate-200 rounded-2xl p-4">

@@ -35,7 +35,7 @@ class CreateNewUser implements CreatesNewUsers
 
         $newUser->assignRole($userRole);
 
-        activity()->causedBy($newUser)->withProperties(['ip'=>request()->ip()])->log('Account registered');
+        activity()->causedBy($newUser)->withProperties(['describe'=>request()->ip()])->log('Account registered');
 
         return $newUser;
 

@@ -23,7 +23,7 @@
     </div>
 
     {{-- SECOND ROW --}}
-    <div class="p-4 border border-zinc-700 rounded-lg">
+    <div class="p-4 border border-slate-300 dark:border-zinc-700 rounded-lg">
 
         {{-- header and modal --}}
         <div class="flex items-center justify-between mb-4">

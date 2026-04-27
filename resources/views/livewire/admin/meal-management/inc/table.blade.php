@@ -72,17 +72,17 @@
                         <div class="flex justify-end gap-2">
 
                             <button wire:click.prevent="singleView({{ $row->id }})"
-                                class="text-blue-500 hover:text-blue-400 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
+                                class="text-blue-500 hover:text-blue-400 p-1 bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
                                 <x-icons.notepad-text size="17" />
                             </button>
 
                             <button wire:click.prevent="edit({{ $row->id }})"
-                                class="text-green-500 hover:text-green-400 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
+                                class="text-green-500 hover:text-green-400 p-1 bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
                                 <x-icons.edit size="16" />
                             </button>
 
                             <button @click="$dispatch('open-delete-modal', { id: {{ $row->id }} })"
-                                class="text-red-600 hover:text-red-500 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
+                                class="text-red-600 hover:text-red-500 p-1 bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
                                 <x-icons.delete size="16" />
                             </button>
                         </div>
