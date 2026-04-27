@@ -687,7 +687,7 @@
   @empty
     <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
       <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white"></div>
-      <p class="text-xs font-bold text-slate-900">Activity log not found</p>
+      <p class="text-xs font-bold text-slate-900">Activity log not found.</p>
     </div>
   @endforelse
 
