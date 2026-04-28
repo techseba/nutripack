@@ -207,6 +207,46 @@ class SubscriptionIndex extends Component
         $this->dispatch('close-select-modal');
     }
 
+    public $showPreview = false;
+    public $selectedMeal = null;
+
+    // Modal Data
+    public $image;
+    public $name;
+    public $description;
+    public $mealDietPlans;
+    public $calories;
+    public $protein;
+    public $carbs;
+    public $fat;
+    public $fiber;
+    public $ingredients = [];
+    public $price;
+
+    public function openPreview($id)
+    {
+        $this->selectedMeal = Meal::find($id);
+        $selectedMeal = Meal::with('ingredients')->findOrFail($id);
+
+        $this->image = $selectedMeal->image;
+        $this->name = $selectedMeal->name;
+        $this->mealDietPlans = $selectedMeal->dietPlans->pluck('name')->join(', ');
+        $this->description = $selectedMeal->description;
+        $this->calories = $selectedMeal->calories;
+        $this->protein = $selectedMeal->protein;
+        $this->carbs = $selectedMeal->carbs;
+        $this->fat = $selectedMeal->fat;
+        $this->ingredients = $selectedMeal->ingredients;
+
+        $this->showPreview = true;
+    }
+
+    public function closePreview()
+    {
+        $this->showPreview = false;
+        $this->selectedMeal = null;
+    }
+
     public function render()
     {
         // if no active subscription show a different view or redirect

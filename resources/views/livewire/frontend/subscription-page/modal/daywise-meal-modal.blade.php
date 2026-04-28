@@ -178,11 +178,18 @@
                                                         @endif
                                                     </button>
 
-                                                    <button type="button" @click="openPreview({{ $meal['id'] }})"
-                                                        class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-100 transition"
-                                                        aria-label="Preview {{ $meal['name'] }}">
-                                                        Preview
-                                                    </button>
+                                                    <div x-data="{ open: @entangle('showPreview') }" x-cloak>
+                                                        {{-- আপনার লুপে থাকা বাটন (আপনি ইতিমধ্যে ব্যবহার করছেন) --}}
+                                                        <button type="button"
+                                                            wire:click.prevent="openPreview({{ $meal['id'] }})"
+                                                            class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-100 transition"
+                                                            aria-label="Preview {{ $meal['name'] }}">
+                                                            Preview
+                                                        </button>
+
+                                                        {{-- Modal --}}
+                                                        @include('frontend.subscription-page.modal.open-preview-daywise-meal')
+                                                    </div>
 
                                                 </div>
                                             </div>
@@ -205,14 +212,14 @@
     <div
         class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-emerald-500/80 backdrop-blur-xs text-white py-2 shadow-inner flex justify-around space-x-10 rounded-ss-xl rounded-se-xl z-50">
 
-        <button @click="modalOpen = false;"
+        <a href="{{ route('subscription') }}" wire:navigate
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 cursor-pointer font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round" />
             </svg>
-            Go back
-        </button>
+            Back to Home
+        </a>
 
 
     </div>

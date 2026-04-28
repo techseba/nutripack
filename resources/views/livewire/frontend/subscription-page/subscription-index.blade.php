@@ -92,13 +92,6 @@
                 </div>
             </div>
 
-
-            {{-- @forelse ($subscriber->deliveryDays as $deliveryDay)
-                {{ \Carbon\Carbon::parse($deliveryDay->delivery_date)->format('d M') }}
-            @empty
-                not
-            @endforelse --}}
-
             {{-- Week grid --}}
             <div class="grid grid-cols-2 gap-3">
 
@@ -161,62 +154,6 @@
 
 
             @include('frontend.subscription-page.modal.daywise-meal-modal')
-            {{-- Week grid --}}
-            {{-- <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                @php
-                    // Ensure $perDay is an array keyed by date strings for the current week
-                    $weekDays = collect(range(0, 6))->map(fn($i) => now()->startOfWeek()->addDays($i)->format('Y-m-d'));
-                @endphp
-
-                @foreach ($weekDays as $day)
-                    @php
-                        $items = $perDay[$day] ?? [];
-                        $isToday = \Carbon\Carbon::parse($day)->isToday();
-                    @endphp
-
-                    <div class="bg-white/90 rounded-xl p-3 shadow-sm border border-slate-200 flex flex-col h-full">
-                        <div class="flex items-center justify-between mb-2">
-                            <div>
-                                <div class="text-xs text-slate-500">{{ \Carbon\Carbon::parse($day)->format('D') }}
-                                </div>
-                                <div class="text-sm font-medium">{{ \Carbon\Carbon::parse($day)->format('d M') }}</div>
-                            </div>
-                            @if ($isToday)
-                                <div class="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full">Today</div>
-                            @endif
-                        </div>
-
-                        <div class="flex-1 overflow-auto">
-                            @if (count($items) === 0)
-                                <div class="text-xs text-slate-400">No delivery</div>
-                            @else
-                                <ul class="space-y-2">
-                                    @foreach ($items as $food)
-                                        <li class="flex items-start gap-3">
-                                            <div
-                                                class="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center text-slate-700 text-sm font-semibold">
-                                                {{ strtoupper(substr($food['name'] ?? ($food->name ?? 'Item'), 0, 1)) }}
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="text-sm font-medium">
-                                                    {{ $food['name'] ?? ($food->name ?? 'Item') }}</div>
-                                                <div class="text-xs text-slate-500">
-                                                    {{ $food['quantity'] ?? ($food->pivot->quantity ?? '1') }} ×
-                                                    {{ $food['size'] ?? '' }}</div>
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </div>
-
-                        <div class="mt-3 text-right">
-                            <button wire:click="skipDay('{{ $day }}')"
-                                class="text-xs text-slate-600 hover:text-slate-800">Skip</button>
-                        </div>
-                    </div>
-                @endforeach
-            </div> --}}
 
         </section>
 
