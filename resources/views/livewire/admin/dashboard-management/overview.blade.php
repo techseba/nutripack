@@ -632,7 +632,7 @@
     </div>
 
     <!-- Activity Sidebar (Right) -->
-    <aside class="w-80 bg-white border-l border-slate-200 hidden 2xl:flex flex-col sticky top-0 h-screen">
+    <aside class="w-80 bg-white backdrop-blur-xs border border-slate-200 rounded-2xl hidden 2xl:flex flex-col sticky top-0 h-screen">
         <div class="p-6 border-b border-slate-100">
             <h3 class="font-bold text-slate-900">Activity Log</h3>
             <p class="text-xs text-slate-500 mt-1">Recent changes to plans & pricing.</p>

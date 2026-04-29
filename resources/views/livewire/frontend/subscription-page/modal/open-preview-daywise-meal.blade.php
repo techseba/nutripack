@@ -21,7 +21,7 @@
         class="relative w-md h-screen bg-white overflow-hidden">
 
         <button @click="open = false; $wire.closePreview();"
-            class="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-red-500 rounded-full text-slate-500 hover:bg-slate-200 transition-colors z-10">
+            class="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-red-500 rounded-full text-slate-500 cursor-pointer transition-colors z-10">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                 </path>

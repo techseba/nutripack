@@ -329,6 +329,9 @@ trait Submit
 
         // 5. success
         $this->dispatch('toast', message: 'Successfully submitted', type: 'success');
+
+        activity()->causedBy(auth()->user())->withProperties(['describe'=>request()->ip()])->log('Plan subscribed');
+
         $this->resetValidation();
         RateLimiter::clear($key);
         $this->redirectRoute('home', navigate: true);

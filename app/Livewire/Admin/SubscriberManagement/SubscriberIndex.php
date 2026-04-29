@@ -223,6 +223,9 @@ class SubscriberIndex extends Component
             $data['updater_id'] = auth()->id();
 
             $subscriber->update($data);
+
+            activity()->causedBy(auth()->user())->withProperties(['describe'=>'Subscriber name - ' . $subscriber->user->name])->log('Subscribed updated with ' . $this->payment_status);
+
             $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
 
         }

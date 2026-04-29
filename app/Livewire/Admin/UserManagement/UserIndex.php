@@ -248,6 +248,8 @@ class UserIndex extends Component
 
             });
 
+            activity()->causedBy(auth()->user())->withProperties(['describe'=>'User name - ' . $user->name])->log('User updated');
+
             // Notifying that a row has been successfully updated into the database
             $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
 
