@@ -13,6 +13,9 @@ use Spatie\Activitylog\Models\Activity;
 #[Layout('layouts::dashboard')]
 class Overview extends Component
 {
+    public $subscriberCount;
+    public $mealCount;
+
     // কত করে লোড হবে প্রতি চাংকে
     public $perPage = 8;
 
@@ -27,7 +30,15 @@ class Overview extends Component
 
     public function mount()
     {
+        $this->refreshCount();
+
         $this->loadMore(); // প্রথমে প্রথম চাংক লোড
+    }
+
+    public function refreshCount()
+    {
+        $this->subscriberCount = Subscriber::count();
+        $this->mealCount = Meal::count();
     }
 
     // চাংক লোড করার মেথড
@@ -88,12 +99,7 @@ class Overview extends Component
     {
         $this->authorize('dashboard.view');
 
-        $subscribers = Subscriber::latest()->get();
-        $meals = Meal::latest()->get();
-
         return view('livewire.admin.dashboard-management.overview', [
-            'subscriberCount' => count($subscribers),
-            'mealCount' => count($meals),
             'activities' => $this->activities,
         ]);
     }

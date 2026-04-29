@@ -1,6 +1,7 @@
 <x-layouts::admin.sidebar :title="$title ?? null">
 
-    <div class="hidden lg:flex items-center justify-between py-2 md:py-4 px-4 border-b border-slate-300 dark:border-zinc-700">
+    <div
+        class="hidden lg:flex items-center justify-between py-2 md:py-4 px-4 border-b border-slate-300 dark:border-zinc-700">
 
         {{-- Breadcrumb --}}
         <div class="flex gap-2">
@@ -23,5 +24,7 @@
 
     <flux:main>
         {{ $slot }}
+
+        <x-widget.system-health />
     </flux:main>
 </x-layouts::admin.sidebar>

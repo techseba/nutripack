@@ -73,7 +73,11 @@
                         <a href="{{ route('admin.subscribers') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $subscriberCount }}</p>
+
+                    <div wire:poll.5000ms="refreshCount">
+                        <p class="text-2xl font-bold text-slate-900">{{ $subscriberCount ?? '—' }}</p>
+                    </div>
+
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">subscribers</p>
                 </div>
 
@@ -105,7 +109,9 @@
                         <a href="{{ route('admin.meals') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $mealCount }}</p>
+                    <div wire:poll.5000ms="refreshCount">
+                        <p class="text-2xl font-bold text-slate-900">{{ $mealCount ?? '—' }}</p>
+                    </div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">Total Meals</p>
                 </div>
 
@@ -632,8 +638,9 @@
     </div>
 
     <!-- Activity Sidebar (Right) -->
-    <aside class="w-80 bg-white backdrop-blur-xs border border-slate-200 rounded-2xl hidden 2xl:flex flex-col sticky top-0 h-screen">
-        <div class="p-6 border-b border-slate-100">
+    <aside
+        class="w-80 bg-white/90 backdrop-blur-xs border border-slate-200 rounded-2xl hidden 2xl:flex flex-col sticky top-0 min-h-160 max-h-180">
+        <div class="p-6 glass rounded-t-2xl border-b border-slate-200 shadow-md">
             <h3 class="font-bold text-slate-900">Activity Log</h3>
             <p class="text-xs text-slate-500 mt-1">Recent changes to plans & pricing.</p>
         </div>
@@ -666,10 +673,11 @@
             $el.removeEventListener('scroll', onScroll);
             window.removeEventListener('scroll', onScroll);
         };" wire:poll.visible.5000ms="refreshLatest"
-            class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6">
+            class="flex-1 overflow-y-auto custom-scrollbar p-4 pb-25 space-y-4">
             {{-- আপনার আগের markup এখানে অপরিবর্তিত --}}
             @forelse ($activities as $activity)
-                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
+                <div
+                    class="relative pt-2 pl-2 rounded-xl shadow-sm pl-6 pb-6 bg-white border-l border-slate-100 last:border-0 last:pb-0">
                     <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white">
                     </div>
                     <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
@@ -689,302 +697,56 @@
                 </div>
             @endforelse
 
-            <div class="py-4 text-center">
+            <div class="p-4 text-center">
                 <div wire:loading wire:target="loadMore,refreshLatest" class="text-sm text-slate-500">Loading...</div>
                 <div x-show="loading" class="text-sm text-slate-500">Loading more...</div>
             </div>
         </div>
 
-
-
-
-        {{-- <div wire:poll.5000ms class="flex-1 overflow-y-auto custom-scrollbar p-6 pb-25 space-y-6">
-            @forelse ($activities as $activity)
-                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white">
-                    </div>
-                    <p class="text-xs font-bold text-slate-900">{{ $activity->description }}</p>
-                    <p class="text-[10px] text-slate-500 mt-1">{{ $activity->properties['describe'] ?? '-' }}</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <img src="{{ asset('assets/admin/user.png') }}" class="w-4 h-4 rounded-full" alt="User">
-                        <span class="text-[10px] font-medium text-slate-400">{{ $activity->causer->name }}. •
-                            {{ $activity->created_at->diffForHumans() }}</span>
-                    </div>
-                </div>
-            @empty
-                <div class="relative pl-6 pb-6 border-l border-slate-100 last:border-0 last:pb-0">
-                    <div class="absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-200 border-2 border-white">
-                    </div>
-                    <p class="text-xs font-bold text-slate-900">Activity log not found</p>
-                </div>
-            @endforelse
-        </div> --}}
-
-        <div class="fixed bottom-0 right-7.5 w-80 p-6">
-            <div class="bg-white/10 backdrop-blur-xs border border-slate-200 rounded-2xl p-4">
+        <div class="w-80 p-4">
+            <div class="bg-white/90 backdrop-blur-xs border border-slate-300 rounded-2xl p-4">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">System Health</span>
                     <span class="w-2 h-2 bg-success rounded-full"></span>
                 </div>
-                <div class="space-y-2">
+
+                <div class="space-y-2" x-data="{
+                    latency: '—',
+                    width: 0,
+                    maxLatency: 500,
+                    async measure() {
+                        const start = performance.now();
+                        await fetch('/ping', { cache: 'no-store' });
+                        const end = performance.now();
+                        const rtt = Math.round(end - start); // number in ms
+
+                        this.latency = rtt + 'ms';
+
+                        // Map latency -> width (lower latency => higher width)
+                        let pct = (1 - (rtt / this.maxLatency)) * 100;
+                        pct = Math.max(5, Math.min(100, Math.round(pct))); // clamp 5..100
+                        this.width = pct;
+                    }
+                }" x-init="measure();
+                setInterval(() => measure(), 5000)">
+
                     <div class="flex justify-between text-[10px]">
                         <span class="text-slate-500">API Latency</span>
-                        <span class="font-bold">24ms</span>
+                        <div>
+                            <span class="font-bold" x-text="latency"></span>
+                        </div>
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-1">
-                        <div class="bg-green-400 h-1 rounded-full" style="width: 85%"></div>
+
+                    <div class="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                        <div :style="`width: ${width}%`"
+                            :class="(width > 60) ? 'bg-green-400' : (width > 30 ? 'bg-yellow-400' : 'bg-red-500')"
+                            class="h-1 rounded-full transition-all duration-300 ease-out"></div>
                     </div>
                 </div>
+
+
             </div>
         </div>
+
     </aside>
-
-    <script>
-        function planManager() {
-            return {
-                activeTab: 'basic',
-                showForm: true,
-                init() {
-                    this.$watch('plan', () => this.$nextTick(() => lucide.createIcons()));
-                    this.$watch('activeTab', () => this.$nextTick(() => lucide.createIcons()));
-                    this.$nextTick(() => lucide.createIcons());
-                },
-                stats: [{
-                        label: 'Total Plans',
-                        value: '24',
-                        icon: 'layers',
-                        color: 'text-blue-600',
-                        bg: 'bg-blue-50',
-                        trend: 12
-                    },
-                    {
-                        label: 'Active Plans',
-                        value: '18',
-                        icon: 'check-circle',
-                        color: 'text-emerald-600',
-                        bg: 'bg-emerald-50',
-                        trend: 5
-                    },
-                    {
-                        label: 'Draft Plans',
-                        value: '6',
-                        icon: 'file-text',
-                        color: 'text-slate-600',
-                        bg: 'bg-slate-50',
-                        trend: -2
-                    },
-                    {
-                        label: 'Recommended',
-                        value: '4',
-                        icon: 'star',
-                        color: 'text-amber-600',
-                        bg: 'bg-amber-50',
-                        trend: 0
-                    },
-                    {
-                        label: 'Combinations',
-                        value: '128',
-                        icon: 'grid',
-                        color: 'text-purple-600',
-                        bg: 'bg-purple-50',
-                        trend: 18
-                    },
-                    {
-                        label: 'Discounted',
-                        value: '12',
-                        icon: 'percent',
-                        color: 'text-rose-600',
-                        bg: 'bg-rose-50',
-                        trend: 8
-                    }
-                ],
-                existingPlans: [{
-                        id: 1,
-                        name: 'Weight Loss Pro',
-                        slug: 'weight-loss-pro',
-                        meals: ['Breakfast', 'Lunch', 'Snacks'],
-                        status: 'active',
-                        recommended: true
-                    },
-                    {
-                        id: 2,
-                        name: 'Muscle Gain Elite',
-                        slug: 'muscle-gain-elite',
-                        meals: ['Lunch', 'Dinner', 'Snacks'],
-                        status: 'active',
-                        recommended: false
-                    },
-                    {
-                        id: 3,
-                        name: 'Office Lunch Pack',
-                        slug: 'office-lunch',
-                        meals: ['Lunch', 'Snacks'],
-                        status: 'active',
-                        recommended: true
-                    },
-                    {
-                        id: 4,
-                        name: 'Full Day Nutrition',
-                        slug: 'full-day',
-                        meals: ['Breakfast', 'Lunch', 'Dinner', 'Snacks'],
-                        status: 'draft',
-                        recommended: false
-                    },
-                    {
-                        id: 5,
-                        name: 'Keto Special',
-                        slug: 'keto-special',
-                        meals: ['Lunch', 'Dinner', 'Snacks'],
-                        status: 'active',
-                        recommended: false
-                    }
-                ],
-                combinationMatrix: [{
-                        label: 'B + S',
-                        icon: 'coffee',
-                        active: true
-                    },
-                    {
-                        label: 'L + S',
-                        icon: 'sun',
-                        active: true
-                    },
-                    {
-                        label: 'D + S',
-                        icon: 'moon',
-                        active: true
-                    },
-                    {
-                        label: 'B + L + S',
-                        icon: 'utensils',
-                        active: true
-                    },
-                    {
-                        label: 'L + D + S',
-                        icon: 'utensils-crosses',
-                        active: true
-                    },
-                    {
-                        label: 'B + D + S',
-                        icon: 'sunrise',
-                        active: false
-                    },
-                    {
-                        label: 'ALL + S',
-                        icon: 'package',
-                        active: true
-                    },
-                    {
-                        label: 'S ONLY',
-                        icon: 'cookie',
-                        active: false
-                    }
-                ],
-                activityLogs: [{
-                        id: 1,
-                        action: 'Plan Updated',
-                        details: 'Weight Loss Pro price increased by 5%',
-                        user: 'Sarah K.',
-                        time: '2m ago',
-                        userAvatar: 'https://picsum.photos/seed/sarah/50/50'
-                    },
-                    {
-                        id: 2,
-                        action: 'New Plan Created',
-                        details: 'Keto Special draft was published',
-                        user: 'Mike R.',
-                        time: '45m ago',
-                        userAvatar: 'https://picsum.photos/seed/mike/50/50'
-                    },
-                    {
-                        id: 3,
-                        action: 'Discount Changed',
-                        details: 'Monthly discount set to 15% for all plans',
-                        user: 'Imran H.',
-                        time: '2h ago',
-                        userAvatar: 'https://picsum.photos/seed/imran/50/50'
-                    },
-                    {
-                        id: 4,
-                        action: 'Status Change',
-                        details: 'Office Lunch Pack marked as Recommended',
-                        user: 'Sarah K.',
-                        time: '5h ago',
-                        userAvatar: 'https://picsum.photos/seed/sarah/50/50'
-                    }
-                ],
-                plan: {
-                    name: 'Weight Loss Pro',
-                    slug: 'weight-loss-pro',
-                    description: 'Specifically designed for calorie deficit with high protein meals to keep you full and energized.',
-                    status: 'active',
-                    recommended: true,
-                    meals: {
-                        breakfast: true,
-                        lunch: true,
-                        dinner: false,
-                        snacks: true
-                    },
-                    durations: [{
-                            label: 'Weekly',
-                            days: 7,
-                            discountType: 'percentage',
-                            discountValue: 0,
-                            recommended: false
-                        },
-                        {
-                            label: 'Monthly',
-                            days: 30,
-                            discountType: 'percentage',
-                            discountValue: 10,
-                            recommended: true
-                        }
-                    ],
-                    pricing: {
-                        basePrice: 40,
-                        pricePerMeal: 12,
-                        adjustments: {
-                            breakfast: -2,
-                            lunch: 0,
-                            dinner: 3
-                        }
-                    }
-                },
-                get hasMainMeal() {
-                    return this.plan.meals.breakfast || this.plan.meals.lunch || this.plan.meals.dinner;
-                },
-                calculatePrice(duration) {
-                    let mealCount = 0;
-                    let totalAdjustment = 0;
-                    if (this.plan.meals.breakfast) {
-                        mealCount++;
-                        totalAdjustment += Number(this.plan.pricing.adjustments.breakfast);
-                    }
-                    if (this.plan.meals.lunch) {
-                        mealCount++;
-                        totalAdjustment += Number(this.plan.pricing.adjustments.lunch);
-                    }
-                    if (this.plan.meals.dinner) {
-                        mealCount++;
-                        totalAdjustment += Number(this.plan.pricing.adjustments.dinner);
-                    }
-                    if (this.plan.meals.snacks) {
-                        mealCount++;
-                    } // Snacks are mandatory
-
-                    const dailyPrice = Number(this.plan.pricing.basePrice) + (mealCount * Number(this.plan.pricing
-                        .pricePerMeal)) + totalAdjustment;
-                    let total = dailyPrice * duration.days;
-
-                    if (duration.discountType === 'percentage') {
-                        total = total * (1 - duration.discountValue / 100);
-                    } else {
-                        total = total - duration.discountValue;
-                    }
-
-                    return total.toFixed(2);
-                }
-            }
-        }
-    </script>
 </div>
