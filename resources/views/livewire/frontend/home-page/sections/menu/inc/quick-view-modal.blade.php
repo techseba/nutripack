@@ -47,32 +47,32 @@
                 <div class="grid grid-cols-4 gap-2">
 
                     <div class="p-4 bg-slate-50 rounded-2xl">
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">calories</p>
+                        <p class="text-lg font-bold text-slate-800">{{ $this->calories ?? '-' }}</p>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-2xl">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Protein</p>
-                        <p class="text-lg font-bold text-slate-800">{{ $this->protein }}</p>
+                        <p class="text-lg font-bold text-slate-800">{{ $this->protein ?? '-' }}g</p>
                     </div>
 
                     <div class="p-4 bg-slate-50 rounded-2xl">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Carbs</p>
-                        <p class="text-lg font-bold text-slate-800">{{ $this->carbs }}</p>
+                        <p class="text-lg font-bold text-slate-800">{{ $this->carbs ?? '-' }}g</p>
                     </div>
 
                     <div class="p-4 bg-slate-50 rounded-2xl">
                         <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Fat</p>
-                        <p class="text-lg font-bold text-slate-800">{{ $this->fat }}</p>
-                    </div>
-
-                    <div class="p-4 bg-slate-50 rounded-2xl">
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Fiber</p>
-                        <p class="text-lg font-bold text-slate-800">{{ $this->fiber }}</p>
+                        <p class="text-lg font-bold text-slate-800">{{ $this->fat ?? '-' }}g</p>
                     </div>
 
                 </div>
 
                 <div>
                     <h2 class="font-medium text-lg mb-1">Ingredients</h2>
-                    <div class="grid grid-cols-4 gap-2 h-20 overflow-y-auto">
+                    <div class="grid grid-cols-4 gap-2">
 
-                        @forelse ($this->ingredients as $ingredient)
+                        @forelse ($this->ingredients ?? [] as $ingredient)
                             <div class="text-center">
                                 @if ($ingredient->image)
                                     <img class="w-10 h-10 m-auto bg-white border border-slate-400 rounded-full object-cover"
@@ -95,15 +95,6 @@
                     </div>
                 </div>
 
-                <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
-                    <div>
-                        <span class="text-3xl">🔥</span>
-                        <span class="text-2xl font-black text-emerald-500">{{ round($this->calories) }} kcal</span>
-                    </div>
-                    <a href="{{ route('plan') }}" wire:navigate
-                        class="btn-shine px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-xl hover:bg-emerald-600 transition-all">Select
-                        Plan</a>
-                </div>
             </div>
         </div>
     </div>
