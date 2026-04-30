@@ -34,12 +34,12 @@ class PlanDetailsIndex extends Component
     public $delivery_time;
     public $starting_date;
     public $expires_date;
-    public $phone = "01724942587";
-    public $house = "1";
-    public $road = "1";
-    public $block = "1";
-    public $area = "1";
-    public $additional_direction = "1";
+    public $phone = "";
+    public $house = "";
+    public $road = "";
+    public $block = "";
+    public $area = "";
+    public $additional_direction = "";
 
     public $promo_code = '';
     public $promoItem = null;
