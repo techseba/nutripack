@@ -71,13 +71,21 @@
 
                 @can('meal.view')
                     {{-- day wise meals --}}
+                    <flux:sidebar.item icon="meals" :href="route('admin.additional-meals')"
+                        :current="request()->routeIs('admin.additional-meals')" wire:navigate>
+                        {{ __('Additional Meals') }}
+                    </flux:sidebar.item>
+                @endcan
+
+                @can('guest-meal.view')
+                    {{-- day wise meals --}}
                     <flux:sidebar.item icon="guest-meals" :href="route('admin.guest-meals')"
                         :current="request()->routeIs('admin.guest-meals')" wire:navigate>
                         {{ __('Guest Meals') }}
                     </flux:sidebar.item>
                 @endcan
 
-                @can('meal.view')
+                @can('day-wise-meal.view')
                     {{-- day wise meals --}}
                     <flux:sidebar.item icon="day-wise-meals" :href="route('admin.day-wise-meals')"
                         :current="request()->routeIs('admin.day-wise-meals')" wire:navigate>
