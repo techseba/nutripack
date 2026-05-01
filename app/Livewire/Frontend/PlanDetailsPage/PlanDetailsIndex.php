@@ -4,11 +4,11 @@ namespace App\Livewire\Frontend\PlanDetailsPage;
 
 use App\Livewire\Frontend\PlanDetailsPage\Traits\PromoApply;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\Submit;
+use App\Models\AdditionalMeal;
 use App\Models\DietPlan;
 use App\Models\Ingredient;
 use App\Models\Plan;
 use App\Models\PlanCategory;
-use App\Models\PromoCode;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -21,6 +21,7 @@ use Livewire\Component;
 class PlanDetailsIndex extends Component
 {
     public $dietPlans;
+    public $additional_meals;
     public $ingredients;
 
     public $diet_plan_id;
@@ -53,6 +54,7 @@ class PlanDetailsIndex extends Component
     {
         $this->timezone = auth()->user()->timezone ?? 'UTC';
         $this->dietPlans = DietPlan::orderBy('name')->get(['id','name']);
+        $this->additional_meals = AdditionalMeal::where('status', 'active')->orderBy('name')->get();
         $this->ingredients = Ingredient::orderBy('name')->get(['id','name']);
 
         $this->originalPrice = (float) $price;
@@ -196,6 +198,7 @@ class PlanDetailsIndex extends Component
     {
         return view('livewire.frontend.plan-details-page.plan-details-index', [
             'dietPlans' => $this->dietPlans,
+            'dietPlans' => $this->additional_meals,
             'ingredients' => $this->ingredients,
             'planCategories' => $this->planCategories,
             'daysOptions' => $this->daysOptions,

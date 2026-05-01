@@ -1,6 +1,6 @@
 <x-modal.form isFileUpload isEdit="{{ $this->isEdit }}" size="lg">
 
-    <div class="grid grid-cols-2 gap-x-5">
+    <div class="grid lg:grid-cols-2 gap-x-5">
         <div class="space-y-5">
             <x-form.field-input model="name" label="name" required />
             @if($isEdit)
