@@ -16,7 +16,7 @@
                 </x-table.th>
                 <x-table.th class="w-15">ID</x-table.th>
                 <x-table.th>name</x-table.th>
-                <x-table.th>permissions</x-table.th>
+                <x-table.th class="">permissions</x-table.th>
                 <x-table.th>created at</x-table.th>
                 <x-table.th class="w-20">actions</x-table.th>
             </x-table.tr>
@@ -40,7 +40,7 @@
                     <x-table.td>{{ $row->id }}</x-table.td>
                     <x-table.td>{!! highlight($row->name, $this->search) !!}</x-table.td>
                     <x-table.td>
-                        <div class="grid grid-cols-5 gap-2">
+                        <div class="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-2">
                             @forelse ($row->permissions->pluck('name') as $permission)
                                 <span>{{ $permission }}</span>
                             @empty

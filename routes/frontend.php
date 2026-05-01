@@ -12,3 +12,6 @@ Route::get('/plan', PlanDetailsIndex::class)->middleware('auth')->name('plan');
 
 Route::get('/subscription', SubscriptionIndex::class)->middleware('auth')->name('subscription');
 
+Route::get('/ping', function () {
+    return response()->json(['ok' => true]);
+});

@@ -11,7 +11,7 @@
         }
     </style>
 
-    <div class="w-80 p-4 glass rounded-2xl p-4">
+    <div class="w-80 p-4 glass rounded-2xl">
         <div class="flex items-center justify-between mb-3">
             <span class="text-[10px] font-bold text-slate-800 uppercase tracking-widest">System Health</span>
             <span class="w-2 h-2 bg-success rounded-full"></span>

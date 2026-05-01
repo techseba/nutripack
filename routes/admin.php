@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\AdditionalMealManagement\AdditionalMealIndex;
 use App\Livewire\Admin\DashboardManagement\Overview;
 use App\Livewire\Admin\DayWiseMealManagement\DayWiseMealIndex;
 use App\Livewire\Admin\DeliveryReportManagement\DeliveryReportIndex;
@@ -31,6 +32,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->as('admin.')->group( f
     Route::get('meal-types', MealTypeIndex::class)->name('meal-types');
     Route::get('ingredients', IngredientIndex::class)->name('ingredients');
     Route::get('meals', MealIndex::class)->name('meals');
+    Route::get('additional-meals', AdditionalMealIndex::class)->name('additional-meals');
 
     Route::get('guest-meals', GuestMealIndex::class)->name('guest-meals');
 

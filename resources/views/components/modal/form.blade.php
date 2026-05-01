@@ -25,8 +25,8 @@
             $sizeClass = match ($size) {
                 'sm' => 'w-sm max-w-sm',
                 'md' => 'w-sm md:w-lg max-w-lg',
-                'lg' => 'w-md md:w-2xl max-w-2xl',
-                'xl' => 'w-lg md:w-4xl max-w-4xl',
+                'lg' => 'w-sm md:w-2xl max-w-2xl',
+                'xl' => 'w-sm md:w-4xl max-w-4xl',
                 'full' => 'w-[95vw] h-[90vh]',
                 default => 'w-sm md:w-lg max-w-lg',
             };

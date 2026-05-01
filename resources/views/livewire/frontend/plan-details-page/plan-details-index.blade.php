@@ -103,6 +103,42 @@
                     <label class="col-span-1 font-medium">Plan Price</label>
                     <span class="col-span-2 focus:outline-0 font-bold text-right">{{ $selectedPlan->price }} BHD</span>
                 </div>
+
+                <div
+                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="font-medium">Additional Breakfast</label>
+                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
+                </div>
+
+                <div
+                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="font-medium">Additional Lunch</label>
+                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
+                </div>
+
+                <div
+                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="font-medium">Additional Dinner</label>
+                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
+                </div>
+
+                <div
+                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="font-medium">Additional Salad</label>
+                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
+                </div>
+
+                <div
+                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="font-medium">Additional Snacks</label>
+                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
+                </div>
+
+                <div
+                    class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                    <label class="col-span-1 font-medium">Additional Price</label>
+                    <span class="col-span-2 focus:outline-0 font-bold text-right">{{ $selectedPlan->price }} BHD</span>
+                </div>
             @else
                 <div class="text-sm text-gray-500 text-center">No plan selected.</div>
             @endif
