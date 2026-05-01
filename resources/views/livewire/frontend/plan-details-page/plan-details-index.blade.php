@@ -103,45 +103,28 @@
                     <label class="col-span-1 font-medium">Plan Price</label>
                     <span class="col-span-2 focus:outline-0 font-bold text-right">{{ $selectedPlan->price }} BHD</span>
                 </div>
-
-                <div
-                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="font-medium">Additional Breakfast</label>
-                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
-                </div>
-
-                <div
-                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="font-medium">Additional Lunch</label>
-                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
-                </div>
-
-                <div
-                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="font-medium">Additional Dinner</label>
-                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
-                </div>
-
-                <div
-                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="font-medium">Additional Salad</label>
-                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
-                </div>
-
-                <div
-                    class="flex justify-between items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="font-medium">Additional Snacks</label>
-                    <button class="focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold text-right">Add+</button>
-                </div>
-
-                <div
-                    class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-                    <label class="col-span-1 font-medium">Additional Price</label>
-                    <span class="col-span-2 focus:outline-0 font-bold text-right">{{ $selectedPlan->price }} BHD</span>
-                </div>
             @else
                 <div class="text-sm text-gray-500 text-center">No plan selected.</div>
             @endif
+        </fieldset>
+
+        {{-- additional meals --}}
+        <fieldset
+            class="flex flex-col gap-y-4 bg-white border border-slate-400 ring-10 ring-white shadow-lg shadow-gray-400 p-2 rounded-lg mb-8">
+            <legend class="font-medium text-md">Select additional meals</legend>
+
+            <div
+                class="grid grid-cols-4 items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                <label class="col-span-3 font-medium">Breakfast ( BHD 30 )</label>
+                <input type="number" min="0" value="0" class="col-span-1 focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold" />
+            </div>
+
+            <div
+                class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+                <label class="col-span-1 font-medium">Additional Price</label>
+                <span class="col-span-2 focus:outline-0 font-bold text-right">0 BHD</span>
+            </div>
+
         </fieldset>
 
         {{-- allergen  ingredients --}}
@@ -212,7 +195,8 @@
             @error('starting_date')
                 <div class="text-red-600 text-right text-sm -mt-3 mr-2">{{ $message }}</div>
             @else
-                <p class="text-xs text-slate-400 text-center -mt-2 italic">* We need at least 24 hours to prepare your first
+                <p class="text-xs text-slate-400 text-center -mt-2 italic">* We need at least 24 hours to prepare your
+                    first
                     batch.</p>
             @enderror
 
