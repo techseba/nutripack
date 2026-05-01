@@ -364,6 +364,17 @@ class SubscriberIndex extends Component
         $this->resetPage();
     }
 
+    public function getMissingSubscriber()
+    {
+        $date = now()->addDay()->toDateString(); // notify for tomorrow
+        dd($date);
+        $subs = Subscriber::active()->where('expires_date','>=',$date)
+            ->whereDoesntHave('selections', fn($q)=> $q->whereDate('date',$date))
+            ->with('user')->get();
+
+
+    }
+
     public function render()
     {
         $this->authorize('subscriber.view');

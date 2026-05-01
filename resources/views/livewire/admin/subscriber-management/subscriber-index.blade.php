@@ -31,6 +31,8 @@
             {{-- header --}}
             <x-widget.table-header />
 
+            {{-- <button wire:click="getMissingSubscriber">check</button> --}}
+
             {{-- modal --}}
             @include('admin.subscriber-management.inc.form')
         </div>
