@@ -6,9 +6,12 @@
         <div
             class="grid grid-cols-4 items-center text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
             <label class="col-span-3 font-medium">{{ $additional_meal->name }} ( BHD {{ $additional_meal->unit_price }} )</label>
-            <input type="number" min="0" max="{{ $additional_meal->max_quantity }}" value="0"
+            <input type="number" min="0" max="{{ $additional_meal->max_quantity }}" value="0" wire:model.live="{{ $additional_meal->name }}"
                 class="col-span-1 focus:outline-0 bg-white border border-slate-400 rounded-md py-1 px-2 font-bold" />
         </div>
+
+        {{ $this->Breakfast * $additional_meal->unit_price ?? 0 }}
+        
     @endforeach
 
     <div

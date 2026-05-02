@@ -30,6 +30,9 @@ class PlanDetailsIndex extends Component
     public $selected_plan_id;
 
 
+    public $Breakfast = 0;
+
+
     public $allergens = [];
     public $subscription_days;
     public $delivery_time;
