@@ -160,7 +160,7 @@ class PlanCategoryIndex extends Component
         $this->name         = $meal->name;
         $this->min_calories     = $meal->min_calories;
         $this->protein      = $meal->protein;
-        $this->carbs        = $meal->fat;
+        $this->carbs        = $meal->carbs;
         $this->fat          = $meal->fat;
         $this->fiber        = $meal->fiber;
 
@@ -252,7 +252,7 @@ class PlanCategoryIndex extends Component
                     'required',
                     'string',
                     'max:60',
-                    Rule::unique('diet_plans','slug')->ignore($planCategory->id),
+                    Rule::unique('plan_categories','slug')->ignore($planCategory->id),
                 ],
                 'diet_plan_id'        => ['required','numeric'],
                 'days_of_plan'        => ['required','numeric'],

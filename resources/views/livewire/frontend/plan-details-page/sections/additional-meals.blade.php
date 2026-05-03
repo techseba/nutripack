@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (totalEl) {
-            totalEl.textContent = 'BHDr ' + formatCurrency(grandTotal);
+            totalEl.textContent = 'BHD ' + formatCurrency(grandTotal);
         }
     }
 
