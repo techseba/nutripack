@@ -198,7 +198,7 @@ class PlanDetailsIndex extends Component
     {
         return view('livewire.frontend.plan-details-page.plan-details-index', [
             'dietPlans' => $this->dietPlans,
-            'dietPlans' => $this->additional_meals,
+            'additional_meals' => $this->additional_meals,
             'ingredients' => $this->ingredients,
             'planCategories' => $this->planCategories,
             'daysOptions' => $this->daysOptions,

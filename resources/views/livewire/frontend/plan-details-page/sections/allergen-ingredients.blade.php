@@ -4,7 +4,7 @@
 
     <div class="grid grid-cols-2 gap-2">
         @foreach ($ingredients ?? [] as $ingredient)
-            <label class=" bg-gray-100 border border-dotted border-gray-400 p-1 text-sm rounded-md">
+            <label class="bg-gray-100 border border-dotted border-gray-400 p-1 text-sm rounded-md">
                 <input type="checkbox" wire:model="allergens" value="{{ $ingredient->name }}">
                 {{ $ingredient->name }}
             </label>
