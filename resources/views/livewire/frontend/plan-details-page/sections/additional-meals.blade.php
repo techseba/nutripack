@@ -1,5 +1,9 @@
+{{-- @if ($selectedPlan) --}}
 <fieldset class="flex flex-col gap-y-4 bg-white border border-slate-400 shadow-lg p-3 rounded-lg mb-8">
     <legend class="font-medium text-md">Select additional meals</legend>
+
+    {{-- <pre>{{ json_encode($selectedPlan->planCategory->days_of_plan, JSON_PRETTY_PRINT) }}</pre> --}}
+    {{-- <pre>{{ json_encode($selectedPlan, JSON_PRETTY_PRINT) }}</pre> --}}
 
     @foreach ($additional_meals as $meal)
         <div class="meal-row grid grid-cols-4 items-center gap-2 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 rounded-lg py-2 px-3"
@@ -94,3 +98,4 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTotals();
 });
 </script>
+{{-- @endif --}}
