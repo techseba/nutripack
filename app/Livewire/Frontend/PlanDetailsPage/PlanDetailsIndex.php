@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Frontend\PlanDetailsPage;
 
+use App\Livewire\Frontend\PlanDetailsPage\Traits\AdditionalMeals;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\PromoApply;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\Submit;
 use App\Models\AdditionalMeal;
@@ -20,6 +21,8 @@ use Livewire\Component;
 #[Layout('layouts::frontend')]
 class PlanDetailsIndex extends Component
 {
+    use AdditionalMeals;
+    
     public $dietPlans;
     public $additional_meals;
     public $ingredients;
