@@ -103,3 +103,66 @@
         });
     </script>
 @endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@foreach ($this->additionalMealTypes as $mealTypes)
+            <div
+                class="meal-row grid grid-cols-4 items-center gap-2 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 rounded-lg py-2 px-3">
+                <div class="col-span-2">
+                    <div class="font-medium">{{ $mealTypes->name }}</div>
+                    <div class="text-xs text-slate-500">BHD {{ number_format($mealTypes->unit_price, 2) }}</div>
+                </div>
+
+                <div class="col-span-1 text-sm text-right">
+                    <span class="text-slate-600">Max: {{ $mealTypes->max_quantity }}</span>
+                </div>
+
+                <div class="col-span-1">
+                    <input type="number" wire:model.live.debounce.150ms="qty.{{ $mealTypes['name'] }}" min="0"
+                        max="{{ $mealTypes->max_quantity }}" step="1"
+                        class="w-full focus:outline-0 bg-white border border-slate-300 rounded-md py-1 px-2 font-bold" />
+                </div>
+
+                @if ($this->qty['Breakfast'] > 0)
+                    {{ $breakfastTotal = $mealTypes->unit_price * $this->qty['Breakfast'] }}
+                    <div class="col-span-4 text-right text-sm mt-1 pr-2">
+                        <span class="text-slate-600">Line total: </span>
+                        <span class="line-total font-bold">BHD {{ number_format($breakfastTotal, 2) }}</span>
+                    </div>
+                @endif
+
+                @if ($this->qty['Lunch'] > 0)
+                    {{ $lunchTotal = $mealTypes->unit_price * $this->qty['Lunch'] }}
+                    <div class="col-span-4 text-right text-sm mt-1 pr-2">
+                        <span class="text-slate-600">Line total: </span>
+                        <span class="line-total font-bold">BHD {{ number_format($lunchTotal, 2) }}</span>
+                    </div>
+                @endif
+
+            </div>
+        @endforeach
+
+        <div
+            class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+            <label class="col-span-1 font-medium">Additional Price</label>
+            <span id="additional-total" class="col-span-2 font-bold text-right">BHD 0.00</span>
+        </div>
+
+        <pre>{{ json_encode($this->qty['Breakfast'], JSON_PRETTY_PRINT) }}</pre>
+        {{-- <pre>{{ json_encode($selectedPlan->planCategory->days_of_plan, JSON_PRETTY_PRINT) }}</pre> --}}
+        {{-- <pre>{{ json_encode($selectedPlan, JSON_PRETTY_PRINT) }}</pre> --}}

@@ -5,7 +5,6 @@ namespace App\Livewire\Frontend\PlanDetailsPage;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\AdditionalMeals;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\PromoApply;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\Submit;
-use App\Models\AdditionalMeal;
 use App\Models\DietPlan;
 use App\Models\Ingredient;
 use App\Models\Plan;
@@ -22,36 +21,51 @@ use Livewire\Component;
 class PlanDetailsIndex extends Component
 {
     use AdditionalMeals;
-    
+
     public $dietPlans;
-    public $additional_meals;
+
     public $ingredients;
 
     public $diet_plan_id;
-    public $plan_category_id;
-    public $days_of_week_selected;
-    public $selected_plan_id;
 
+    public $plan_category_id;
+
+    public $days_of_week_selected;
+
+    public $selected_plan_id;
 
     public $Breakfast = 0;
 
-
     public $allergens = [];
+
     public $subscription_days;
+
     public $delivery_time;
+
     public $starting_date;
+
     public $expires_date;
-    public $phone = "";
-    public $house = "";
-    public $road = "";
-    public $block = "";
-    public $area = "";
-    public $additional_direction = "";
+
+    public $phone = '';
+
+    public $house = '';
+
+    public $road = '';
+
+    public $block = '';
+
+    public $area = '';
+
+    public $additional_direction = '';
 
     public $promo_code = '';
+
     public $promoItem = null;
+
     public $originalPrice = 0.00;
+
     public $discountAmount = 0.00;
+
     public $finalPrice = 0.00;
 
     public $timezone;
@@ -59,20 +73,21 @@ class PlanDetailsIndex extends Component
     public function mount($price = 0)
     {
         $this->timezone = auth()->user()->timezone ?? 'UTC';
-        $this->dietPlans = DietPlan::orderBy('name')->get(['id','name']);
-        $this->additional_meals = AdditionalMeal::where('status', 'active')->orderBy('name')->get();
-        $this->ingredients = Ingredient::orderBy('name')->get(['id','name']);
+        $this->dietPlans = DietPlan::orderBy('name')->get(['id', 'name']);
+
+        $this->ingredients = Ingredient::orderBy('name')->get(['id', 'name']);
 
         $this->originalPrice = (float) $price;
         $this->finalPrice = $this->originalPrice;
-
-
     }
 
-    public function setTimezone($tz) {
+    public function setTimezone($tz)
+    {
         if (in_array($tz, \DateTimeZone::listIdentifiers())) {
             $this->timezone = $tz;
-            if (auth()->check()) auth()->user()->update(['timezone' => $tz]);
+            if (auth()->check()) {
+                auth()->user()->update(['timezone' => $tz]);
+            }
         }
     }
 
@@ -87,7 +102,7 @@ class PlanDetailsIndex extends Component
     #[Computed]
     public function getPlanCategoriesProperty()
     {
-        if (!$this->diet_plan_id) {
+        if (! $this->diet_plan_id) {
             return collect();
         }
 
@@ -110,7 +125,7 @@ class PlanDetailsIndex extends Component
     public function getDaysOptionsProperty()
     {
         // nothing to show until category or diet plan selected
-        if (!$this->plan_category_id) {
+        if (! $this->plan_category_id) {
             return collect();
         }
 
@@ -144,12 +159,12 @@ class PlanDetailsIndex extends Component
     public function getPlansProperty()
     {
 
-        if (!$this->plan_category_id || $this->days_of_week_selected === null || $this->days_of_week_selected === '') {
+        if (! $this->plan_category_id || $this->days_of_week_selected === null || $this->days_of_week_selected === '') {
             return collect();
         }
 
         $query = Plan::where('plan_category_id', $this->plan_category_id)
-                 ->where('days_of_week', $this->days_of_week_selected);
+            ->where('days_of_week', $this->days_of_week_selected);
 
         return $query->with(['planCategory.mealTypes'])->orderBy('id')->get();
     }
@@ -157,7 +172,7 @@ class PlanDetailsIndex extends Component
     #[Computed]
     public function getSelectedPlanProperty()
     {
-        if (!$this->selected_plan_id) {
+        if (! $this->selected_plan_id) {
             return null;
         }
 
@@ -169,7 +184,7 @@ class PlanDetailsIndex extends Component
     {
         // delivery_time অপশনগুলোর earliest start time
         $slotStartMap = [
-            'Morning 7am - 1pm'   => '07:00:00',
+            'Morning 7am - 1pm' => '07:00:00',
             'Afternoon 5pm - 8pm' => '17:00:00',
         ];
 
@@ -184,7 +199,7 @@ class PlanDetailsIndex extends Component
         $target = Carbon::now($tz)->addDay();
 
         // টার্গেটের তারিখে ওই স্লটের শুরু সময় — copy() ব্যবহার করে মূল target অপরিবর্তিত রাখি
-        $slotDateTimeOnTarget = Carbon::parse($target->toDateString() . ' ' . $slotTime, $tz);
+        $slotDateTimeOnTarget = Carbon::parse($target->toDateString().' '.$slotTime, $tz);
 
         // যদি স্লটের শুরু সময় target (now +24h) থেকে ছোট হয় -> min হবে পরের দিন
         if ($slotDateTimeOnTarget->lt($target)) {
@@ -197,14 +212,15 @@ class PlanDetailsIndex extends Component
     }
 
     use PromoApply;
-
     use Submit;
 
     public function render()
     {
+
+        $this->loadAdditionalMealTypes();
+
         return view('livewire.frontend.plan-details-page.plan-details-index', [
             'dietPlans' => $this->dietPlans,
-            'additional_meals' => $this->additional_meals,
             'ingredients' => $this->ingredients,
             'planCategories' => $this->planCategories,
             'daysOptions' => $this->daysOptions,
