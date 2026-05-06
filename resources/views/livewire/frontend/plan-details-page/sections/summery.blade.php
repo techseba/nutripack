@@ -31,6 +31,26 @@
             @enderror
         </div>
 
+        @if ($selectedPlan)
+            <div
+                class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+                <label class="col-span-2 font-medium">Subscription Days</label>
+                <span id="additional-total" class="col-span-1 font-bold text-right">
+                    {{ $selectedPlan->planCategory->days_of_plan }} Days</span>
+            </div>
+
+            @php
+                $totalAdditionalMealPrice = $this->totalAdditionalPrice * $selectedPlan->planCategory->days_of_plan;
+            @endphp
+
+            <div
+                class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+                <label class="col-span-2 font-medium">Additional Meals Price</label>
+                <span id="additional-total" class="col-span-1 font-bold text-right">BHD
+                    {{ number_format($totalAdditionalMealPrice, 2) }}</span>
+            </div>
+        @endif
+
         <div
             class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
             <label class="col-span-1 font-medium">Total Price</label>

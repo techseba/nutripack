@@ -6,44 +6,80 @@ use App\Models\AdditionalMeal;
 
 trait AdditionalMeals
 {
-    public $hasBreakfast = false;
-    public $breakfastMaxQuantity = 0;
-    public $breakfastUnitPrice = 0;
+    public $hasBreakfast;
+    public $breakfastMaxQuantity;
+    public $breakfastUnitPrice;
     public $breakfastQuantity = 0;
-    public $breakfastTotalPrice = 0;
+    public $breakfastTotalPrice;
 
-    public $hasSalad = false;
-    public $saladMaxQuantity = 0;
-    public $saladUnitPrice = 0;
+    public $hasLunch;
+    public $lunchMaxQuantity;
+    public $lunchUnitPrice;
+    public $lunchQuantity = 0;
+    public $lunchTotalPrice;
+
+    public $hasSalad;
+    public $saladMaxQuantity;
+    public $saladUnitPrice;
     public $saladQuantity = 0;
-    public $saladTotalPrice = 0;
+    public $saladTotalPrice;
 
-    public $totalAdditionalPrice = 0;
+    public $totalAdditionalPrice;
 
     public function loadAdditionalMealTypes(): void
     {
-        $additionalMealTypes = AdditionalMeal::where('status','active')->orderBy('name')->pluck('name')->toArray();
+        // DB থেকে active meals কে name দিয়ে key করে অ্যারে হিসেবে নিন
+        $additionalMealTypes = AdditionalMeal::where('status', 'active')
+            ->orderBy('name')
+            ->get()
+            ->keyBy('name')
+            ->toArray();
 
-        if (in_array('Breakfast', $additionalMealTypes)) {
+        // defaults / reset
+        $this->hasBreakfast = false;
+        $this->breakfastMaxQuantity = 0;
+        $this->breakfastUnitPrice = 0;
+        $this->breakfastTotalPrice = 0;
+
+        $this->hasLunch = false;
+        $this->lunchMaxQuantity = 0;
+        $this->lunchUnitPrice = 0;
+        $this->lunchTotalPrice = 0;
+
+        $this->hasSalad = false;
+        $this->saladMaxQuantity = 0;
+        $this->saladUnitPrice = 0;
+        $this->saladTotalPrice = 0;
+
+        $this->totalAdditionalPrice = 0;
+
+        // Breakfast সেট করা (DB থেকে)
+        if (isset($additionalMealTypes['Breakfast'])) {
             $this->hasBreakfast = true;
-
-            $this->breakfastMaxQuantity = 5;
-
-            $this->breakfastUnitPrice = 5;
-
-            $this->breakfastTotalPrice = $this->breakfastUnitPrice * $this->breakfastQuantity;
+            $this->breakfastMaxQuantity = (int) ($additionalMealTypes['Breakfast']['max_quantity'] ?? 0);
+            $this->breakfastUnitPrice = (float) ($additionalMealTypes['Breakfast']['unit_price'] ?? 0);
+            // breakfastQuantity আগেই mount() এ ইনিশিয়ালাইজ করা আছে ধরে নিচ্ছি
+            $this->breakfastTotalPrice = $this->breakfastUnitPrice * (int) $this->breakfastQuantity;
         }
 
-        if (in_array('Salad', $additionalMealTypes)) {
+        // Lunch সেট করা (DB থেকে)
+        if (isset($additionalMealTypes['Lunch'])) {
+            $this->hasLunch = true;
+            $this->lunchMaxQuantity = (int) ($additionalMealTypes['Lunch']['max_quantity'] ?? 0);
+            $this->lunchUnitPrice = (float) ($additionalMealTypes['Lunch']['unit_price'] ?? 0);
+            // breakfastQuantity আগেই mount() এ ইনিশিয়ালাইজ করা আছে ধরে নিচ্ছি
+            $this->lunchTotalPrice = $this->lunchUnitPrice * (int) $this->lunchQuantity;
+        }
+
+        // Salad সেট করা (DB থেকে)
+        if (isset($additionalMealTypes['Salad'])) {
             $this->hasSalad = true;
-
-            $this->saladMaxQuantity = 2;
-
-            $this->saladUnitPrice = 50;
-
-            $this->saladTotalPrice = $this->saladUnitPrice * $this->saladQuantity;
+            $this->saladMaxQuantity = (int) ($additionalMealTypes['Salad']['max_quantity'] ?? 0);
+            $this->saladUnitPrice = (float) ($additionalMealTypes['Salad']['unit_price'] ?? 0);
+            $this->saladTotalPrice = $this->saladUnitPrice * (int) $this->saladQuantity;
         }
 
-        $this->totalAdditionalPrice = $this->breakfastTotalPrice + $this->saladTotalPrice;
+        // মোট আপডেট
+        $this->totalAdditionalPrice = $this->breakfastTotalPrice + $this->lunchTotalPrice + $this->saladTotalPrice;
     }
 }
