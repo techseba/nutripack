@@ -32,24 +32,47 @@
         </div>
 
         @if ($selectedPlan)
-            <div
-                class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
-                <label class="col-span-2 font-medium">Subscription Days</label>
-                <span id="additional-total" class="col-span-1 font-bold text-right">
-                    {{ $selectedPlan->planCategory->days_of_plan }} Days</span>
-            </div>
-
             @php
-                $totalAdditionalMealPrice = $this->totalAdditionalPrice * $selectedPlan->planCategory->days_of_plan;
+                $startDate = Carbon\Carbon::parse($this->starting_date);
+                $expiresDate = Carbon\Carbon::parse($this->starting_date)->addDays(
+                    $selectedPlan->planCategory->days_of_plan,
+                )->subDays(1);
+                $planDays = $selectedPlan->planCategory->days_of_plan;
+
+                $totalAdditionalMealPrice = $this->totalAdditionalPrice * $planDays;
             @endphp
 
+            @if (!empty($this->starting_date))
+                <div
+                    class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+                    <label class="col-span-2 font-medium">Starting Date</label>
+                    <span id="additional-total" class="col-span-1 font-bold text-right">
+                        {{ $startDate->format('j M Y') }}</span>
+                </div>
+
+                <div
+                    class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+                    <label class="col-span-2 font-medium">Expires Date</label>
+                    <span id="additional-total" class="col-span-1 font-bold text-right">
+                        {{ $expiresDate->format('j M Y') }}</span>
+                </div>
+            @endif
+
             <div
                 class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
-                <label class="col-span-2 font-medium">Additional Meals Price</label>
+                <label class="col-span-2 font-medium">Plan Days</label>
+                <span id="additional-total" class="col-span-1 font-bold text-right">
+                    {{ $planDays }} Days</span>
+            </div>
+
+            <div
+                class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
+                <label class="col-span-2 font-medium">Total Additional Price</label>
                 <span id="additional-total" class="col-span-1 font-bold text-right">BHD
                     {{ number_format($totalAdditionalMealPrice, 2) }}</span>
             </div>
         @endif
+
 
         <div
             class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">

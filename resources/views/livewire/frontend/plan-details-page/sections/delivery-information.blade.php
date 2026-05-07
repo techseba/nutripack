@@ -40,7 +40,7 @@
     <div
         class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
         <label for="starting_date" class="col-span-1 font-medium">Starting Date</label>
-        <input type="date" id="starting_date" wire:model.prevent="starting_date" {{-- min="{{ now()->addDay()->toDateString() }}" --}}
+        <input type="date" id="starting_date" wire:model.live="starting_date" {{-- min="{{ now()->addDay()->toDateString() }}" --}}
             min="{{ $this->minStartingDate }}"
             class="col-span-2 focus:outline-0 font-bold text-center rounded-md border border-gray-300 py-1 px-2">
     </div>

@@ -42,7 +42,7 @@ class PlanDetailsIndex extends Component
 
     public $delivery_time;
 
-    public $starting_date;
+    public $starting_date = '';
 
     public $expires_date;
 
@@ -213,6 +213,12 @@ class PlanDetailsIndex extends Component
 
     use PromoApply;
     use Submit;
+
+    // public function summeryCalculations()
+    // {
+    //     dd($this->starting_date);
+    //     dd($this->days_of_week_selected);
+    // }
 
     public function render()
     {
