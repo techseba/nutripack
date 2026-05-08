@@ -18,6 +18,7 @@ trait Submit
         // assign userId
         $userId = auth()->id();
 
+        // auth check
         if (!$userId) {
             $this->dispatch('toast', message: 'Please login to subscribe.', type: 'error');
             $this->addError('auth', 'Authentication required.');
@@ -52,7 +53,7 @@ trait Submit
         }
 
         // 4. Register this attempt
-        // RateLimiter::hit($key, $decaySeconds); // RATE LIMITER CODE END
+        RateLimiter::hit($key, $decaySeconds); // RATE LIMITER CODE END
 
 
         // THIS USER ALL READY HAVE SUBSCRIBER CHECK START

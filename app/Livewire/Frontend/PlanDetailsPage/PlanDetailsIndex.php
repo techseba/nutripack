@@ -5,6 +5,7 @@ namespace App\Livewire\Frontend\PlanDetailsPage;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\AdditionalMeals;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\PromoApply;
 use App\Livewire\Frontend\PlanDetailsPage\Traits\Submit;
+use App\Livewire\Frontend\PlanDetailsPage\Traits\Summery;
 use App\Models\DietPlan;
 use App\Models\Ingredient;
 use App\Models\Plan;
@@ -152,6 +153,9 @@ class PlanDetailsIndex extends Component
         $first = $this->plans->first(); // plans computed requires both category+days
         $this->selected_plan_id = $first ? $first->id : null;
 
+        // clear subscription pattern so stale pattern won't linger
+        $this->subscription_days = null;
+
     }
 
     // computed: plans filtered by selected category and optional days_of_week
@@ -213,6 +217,7 @@ class PlanDetailsIndex extends Component
 
     use PromoApply;
     use Submit;
+    use Summery;
 
     // public function summeryCalculations()
     // {

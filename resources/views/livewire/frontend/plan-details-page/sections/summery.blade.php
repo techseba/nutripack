@@ -37,9 +37,10 @@
                 $expiresDate = Carbon\Carbon::parse($this->starting_date)->addDays(
                     $selectedPlan->planCategory->days_of_plan,
                 )->subDays(1);
-                $planDays = $selectedPlan->planCategory->days_of_plan;
 
-                $totalAdditionalMealPrice = $this->totalAdditionalPrice * $planDays;
+                $totalAdditionalMealPrice = $this->totalAdditionalPrice * $this->planDays;
+
+
             @endphp
 
             @if (!empty($this->starting_date))
@@ -62,7 +63,7 @@
                 class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-300 rounded-lg py-2.5 px-3 mt-3">
                 <label class="col-span-2 font-medium">Plan Days</label>
                 <span id="additional-total" class="col-span-1 font-bold text-right">
-                    {{ $planDays }} Days</span>
+                    {{ $this->planDays }} Days</span>
             </div>
 
             <div
@@ -76,11 +77,40 @@
 
         <div
             class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
-            <label class="col-span-1 font-medium">Total Price</label>
+            <label class="col-span-1 font-medium">Plan Price</label>
             <span class="col-span-2 focus:outline-0 font-bold text-right">
                 @if ($selectedPlan)
                     @php
                         $totalPrice = (float) $selectedPlan->price;
+                        // ensure promoItem is array-like and get safe values
+                        $promoType = is_array($promoItem) ? $promoItem['type'] ?? null : null;
+                        $promoValue = is_array($promoItem) ? $promoItem['value'] ?? 0 : 0;
+                        $promoValue = (float) $promoValue;
+                    @endphp
+
+                    @if (!empty($promoType))
+                        @if ($promoType === 'fixed')
+                            @php $totalPrice = max(0, $totalPrice - $promoValue); @endphp
+                        @else
+                            @php $totalPrice = max(0, $totalPrice - $totalPrice * ($promoValue / 100)); @endphp
+                        @endif
+                    @endif
+
+                    {{ number_format($totalPrice, 2, '.', '') }} BHD
+                @else
+                    0.00 BHD
+                @endif
+            </span>
+        </div>
+
+
+        <div
+            class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
+            <label class="col-span-1 font-medium">Total Price</label>
+            <span class="col-span-2 focus:outline-0 font-bold text-right">
+                @if ($selectedPlan)
+                    @php
+                        $totalPrice = (float) $selectedPlan->price + $totalAdditionalMealPrice;
                         // ensure promoItem is array-like and get safe values
                         $promoType = is_array($promoItem) ? $promoItem['type'] ?? null : null;
                         $promoValue = is_array($promoItem) ? $promoItem['value'] ?? 0 : 0;
