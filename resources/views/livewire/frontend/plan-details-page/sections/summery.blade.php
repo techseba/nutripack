@@ -34,12 +34,11 @@
         @if ($selectedPlan)
             @php
                 $startDate = Carbon\Carbon::parse($this->starting_date);
-                $expiresDate = Carbon\Carbon::parse($this->starting_date)->addDays(
-                    $selectedPlan->planCategory->days_of_plan,
-                )->subDays(1);
+                $expiresDate = Carbon\Carbon::parse($this->starting_date)
+                    ->addDays($selectedPlan->planCategory->days_of_plan)
+                    ->subDays(1);
 
                 $totalAdditionalMealPrice = $this->totalAdditionalPrice * $this->planDays;
-
 
             @endphp
 
@@ -103,7 +102,6 @@
             </span>
         </div>
 
-
         <div
             class="grid grid-cols-3 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 shadow-md rounded-lg py-2.5 px-3">
             <label class="col-span-1 font-medium">Total Price</label>
@@ -131,6 +129,16 @@
                 @endif
             </span>
         </div>
+
+        <div class="flex items-center gap-x-1 my-2 text-sm">
+            <label>
+                <input type="checkbox" wire:model.prevent="termsAndConditions">
+            </label>
+            <a href="{{ route('terms-and-conditions') }}" class="font-medium hover:text-blue-600 hover:underline" wire:navigate>Terms & Conditions</a>
+        </div>
+        @error('termsAndConditions')
+            <div class="text-red-600 text-sm">{{ $message }}</div>
+        @enderror
     </div>
 
     <input type="submit"

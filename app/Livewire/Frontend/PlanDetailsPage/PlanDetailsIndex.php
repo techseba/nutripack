@@ -60,6 +60,7 @@ class PlanDetailsIndex extends Component
     public $additional_direction = '';
 
     public $promo_code = '';
+    public $termsAndConditions;
 
     public $promoItem = null;
 

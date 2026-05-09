@@ -116,6 +116,11 @@ trait Submit
 
             'days_of_week_selected' => ['required'],
 
+            // Additional meals rules
+            'breakfastQuantity'=> ['nullable', 'numeric'],
+            'lunchQuantity'=> ['nullable', 'numeric'],
+            'saladQuantity'=> ['nullable', 'numeric'],
+
             'allergens' => ['nullable', 'array'],
             'allergens.*' => ['exists:ingredients,name'],
 
@@ -171,6 +176,7 @@ trait Submit
 
             // প্রোমো কোড
             'promo_code' => ['nullable', 'string', 'max:50'],
+            'termsAndConditions' => ['required'],
         ]);
 
         // 3. load plan
