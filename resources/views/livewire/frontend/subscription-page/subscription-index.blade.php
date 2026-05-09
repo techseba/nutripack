@@ -97,8 +97,15 @@
 
                 @foreach ($subscriber->deliveryDays as $deliveryDay)
                     @php
+                        // $items = $perDay[$deliveryDay->delivery_date] ?? [];
+                        // $isToday = \Carbon\Carbon::parse($deliveryDay->delivery_date)->isToday();
+
+                        $deliveryDate = \Carbon\Carbon::parse($deliveryDay->delivery_date)->startOfDay();
+                        $today = \Carbon\Carbon::today();
+                        $isPast = $deliveryDate->lt($today); // deliveryDate < today
+                        $isToday = $deliveryDate->eq($today); // deliveryDate == today
+                        $isFuture = $deliveryDate->gt($today); // deliveryDate > today
                         $items = $perDay[$deliveryDay->delivery_date] ?? [];
-                        $isToday = \Carbon\Carbon::parse($deliveryDay->delivery_date)->isToday();
                     @endphp
 
                     <div
@@ -106,11 +113,14 @@
                         <div class="flex items-center justify-between mb-2">
                             <div>
                                 <div class="text-xs text-slate-500 group-hover:text-white/80">
-                                    {{ \Carbon\Carbon::parse($deliveryDay->delivery_date)->format('D') }}
+                                    {{ $deliveryDate->format('D') }}
                                 </div>
                                 <div class="text-sm font-medium group-hover:text-white">
-                                    {{ \Carbon\Carbon::parse($deliveryDay->delivery_date)->format('d M Y') }}</div>
+                                    {{ $deliveryDate->format('d M Y') }}
+                                </div>
                             </div>
+
+                            {{-- Status badges --}}
                             @if ($isToday)
                                 <div
                                     class="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 group-hover:text-black rounded-full">
@@ -120,7 +130,13 @@
 
                         <div class="flex-1 overflow-auto">
                             @if (count($items) === 0)
-                                <div class="text-xs text-slate-400 group-hover:text-white/80">No delivery</div>
+                                @if ($isPast)
+                                    <div class="text-xs text-slate-400 group-hover:text-white/80">Delivered</div>
+                                @elseif($isToday)
+                                    <div class="text-xs text-slate-400 group-hover:text-white/80">Processing</div>
+                                @elseif($isFuture)
+                                    <div class="text-xs text-slate-400 group-hover:text-white/80">No delivery</div>
+                                @endif
                             @else
                                 <ul class="space-y-2">
                                     @foreach ($items as $food)
@@ -142,12 +158,14 @@
                             @endif
                         </div>
 
+                        @if ($isFuture)
                         <div class="mt-3 text-right">
                             <button wire:click="showMeals('{{ $deliveryDay->delivery_date }}')"
                                 class="text-xs text-slate-600 border py-1 px-2 rounded cursor-pointer border-emerald-400 font-medium bg-emerald-200 group-hover:border-orange-300 group-hover:bg-orange-400 group-hover:text-white">
                                 Open
                             </button>
                         </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
