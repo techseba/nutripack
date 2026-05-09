@@ -130,11 +130,11 @@
             </span>
         </div>
 
-        <div class="flex items-center gap-x-1 my-2 text-sm">
+        <div class="flex items-center gap-x-1 my-2">
             <label>
                 <input type="checkbox" wire:model.prevent="termsAndConditions">
             </label>
-            <a href="{{ route('terms-and-conditions') }}" class="font-medium hover:text-blue-600 hover:underline" wire:navigate>Terms & Conditions</a>
+            <a href="{{ route('terms-and-conditions') }}" class="hover:text-blue-600 hover:underline" wire:navigate>Terms & Conditions</a>
         </div>
         @error('termsAndConditions')
             <div class="text-red-600 text-sm">{{ $message }}</div>
