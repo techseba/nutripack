@@ -1,4 +1,4 @@
-<main class="max-w-md mx-auto min-h-screen bg-white text-slate-900 px-4 overflow-hidden">
+<main class="max-w-md mx-auto min-h-screen bg-lemon text-slate-900 px-4 overflow-hidden">
 
     {{-- Terms and Conditions contents here --}}
     <section class="py-10">
