@@ -5,9 +5,14 @@
     <div class="space-y-3">
 
         <div x-data="{ open: false }" class="space-y-2">
-            <label class="inline-flex items-center">
-                <input type="checkbox" x-model="open" class="mr-2">
-                <span>Have a promo code?</span>
+
+            <label for="promo-code" class="inline-flex items-start gap-2 text-sm text-gray-700">
+                <input type="checkbox" id="promo-code" x-model="open"
+                    class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+
+                <span>
+                    Have a promo code?
+                </span>
             </label>
 
             <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-300"
@@ -130,19 +135,30 @@
             </span>
         </div>
 
-        <div class="flex items-center gap-x-1 my-2">
-            <label>
-                <input type="checkbox" wire:model.prevent="termsAndConditions">
+        <div class="flex items-start gap-2 my-3">
+            <input type="checkbox" id="terms" wire:model="termsAndConditions"
+                class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
+
+            <label for="terms" class="text-sm text-gray-700">
+                I agree to the
+                <a href="{{ route('terms-and-conditions') }}" class="text-blue-600 hover:underline" wire:navigate>
+                    Terms & Conditions
+                </a>
+                and
+                <a href="{{ route('privacy-policy') }}" class="text-blue-600 hover:underline" wire:navigate>
+                    Privacy Policy
+                </a>
             </label>
-            <a href="{{ route('terms-and-conditions') }}" class="hover:text-blue-600 hover:underline" wire:navigate>Terms & Conditions</a>
         </div>
         @error('termsAndConditions')
             <div class="text-red-600 text-sm">{{ $message }}</div>
         @enderror
     </div>
 
-    <input type="submit"
-        class="bg-amber-400 rounded-lg capitalize border text-gray-800 font-medium hover:bg-amber-500 transition-colors cursor-pointer border-gray-400 py-2 px-4"
-        value="order now">
+    <button type="submit" wire:loading.attr="disabled"
+        class="bg-amber-400 rounded-lg capitalize border text-gray-800 font-medium hover:bg-amber-500 transition-colors border-gray-400 py-2 px-4">
+        <span wire:loading.remove>Order now</span>
+        <span wire:loading>Please wait Submit your preferences...</span>
+    </button>
 
 </fieldset>

@@ -1,12 +1,17 @@
 <?php
+
 namespace App\Livewire\Frontend\PlanDetailsPage\Traits;
 
+use App\Mail\UserSubscribedMail;
 use App\Models\Plan;
 use App\Models\PromoCode;
 use App\Models\Subscriber;
+use App\Notifications\NewSubscriptionNotification;
 use App\Services\SubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
@@ -19,23 +24,23 @@ trait Submit
         $userId = auth()->id();
 
         // auth check
-        if (!$userId) {
+        if (! $userId) {
             $this->dispatch('toast', message: 'Please login to subscribe.', type: 'error');
             $this->addError('auth', 'Authentication required.');
+
             return;
         }
 
         // RATE LIMITER CODE START
-        $userPart = $userId ? 'user:' . $userId : 'ip:' . request()->ip(); // 1. Normalize identity for key of Ratelimit
+        $userPart = $userId ? 'user:'.$userId : 'ip:'.request()->ip(); // 1. Normalize identity for key of Ratelimit
         // optional: include plan id to avoid cross-plan interference
-        $planPart = isset($this->selected_plan_id) ? 'plan:' . (int) $this->selected_plan_id : 'plan:none';
+        $planPart = isset($this->selected_plan_id) ? 'plan:'.(int) $this->selected_plan_id : 'plan:none';
 
         // normalize a short action key
         $key = "submit-attempts:{$userPart}:{$planPart}";
 
         $maxAttempts = 3;      // allowed tries
         $decaySeconds = 60;    // reset window in seconds
-
 
         // 3. Rate limit check AFTER validation (so typos don't count)
         // If you prefer to count every click, move this block before validate()
@@ -49,12 +54,12 @@ trait Submit
             ]);
             $this->dispatch('toast', message: "Too many attempts. Try again in {$seconds} seconds.", type: 'error');
             $this->addError('rate_limit', 'Too many attempts. Please wait and try again.');
+
             return;
         }
 
         // 4. Register this attempt
         RateLimiter::hit($key, $decaySeconds); // RATE LIMITER CODE END
-
 
         // THIS USER ALL READY HAVE SUBSCRIBER CHECK START
         if ($userId) {
@@ -67,34 +72,41 @@ trait Submit
             if ($hasActiveDuringPeriod) {
                 $until = $hasActiveDuringPeriod->expires_date->toDateString();
                 $this->dispatch('toast', message: "You already have an active subscription in its period. You cannot subscribe to another plan until {$until} it expires.", type: 'error');
+
                 return;
             }
         } // THIS USER ALL READY HAVE SUBSCRIBER CHECK END
 
         // যদি কোনো একটি প্রয়োজনীয় ফিল্ড খালি থাকে -> ত্রুটি দেখাও
         if (
-            !$this->diet_plan_id ||
-            !$this->plan_category_id ||
-            !$this->selected_plan_id ||
-            !$this->subscription_days ||
-            !$this->delivery_time ||
-            !$this->starting_date
+            ! $this->diet_plan_id ||
+            ! $this->plan_category_id ||
+            ! $this->selected_plan_id ||
+            ! $this->subscription_days ||
+            ! $this->delivery_time ||
+            ! $this->starting_date
         ) {
             // একত্রিত করে ত্রুটি বার্তা তৈরি করা (প্রয়োজনে বাংলা/ইংরেজি কাস্টমাইজ করো)
             $messages = [];
 
-            if (!$this->diet_plan_id)
+            if (! $this->diet_plan_id) {
                 $messages[] = 'Please select a diet plan.';
-            if (!$this->plan_category_id)
+            }
+            if (! $this->plan_category_id) {
                 $messages[] = 'Please select a plan category.';
-            if (!$this->selected_plan_id)
+            }
+            if (! $this->selected_plan_id) {
                 $messages[] = 'Please select days to choose a plan.';
-            if (!$this->subscription_days)
+            }
+            if (! $this->subscription_days) {
                 $messages[] = 'Please select subscription days.';
-            if (!$this->delivery_time)
+            }
+            if (! $this->delivery_time) {
                 $messages[] = 'Please select delivery time.';
-            if (!$this->starting_date)
+            }
+            if (! $this->starting_date) {
                 $messages[] = 'Please select starting date.';
+            }
 
             // প্রতিটি মেসেজ আলাদা টোস্ট হিসেবে পাঠানো (তোমার ফ্রন্টএন্ড স্ট্যাকিং সাপোর্ট করে)
             foreach ($messages as $msg) {
@@ -117,9 +129,9 @@ trait Submit
             'days_of_week_selected' => ['required'],
 
             // Additional meals rules
-            'breakfastQuantity'=> ['nullable', 'numeric'],
-            'lunchQuantity'=> ['nullable', 'numeric'],
-            'saladQuantity'=> ['nullable', 'numeric'],
+            'breakfastQuantity' => ['nullable', 'numeric'],
+            'lunchQuantity' => ['nullable', 'numeric'],
+            'saladQuantity' => ['nullable', 'numeric'],
 
             'allergens' => ['nullable', 'array'],
             'allergens.*' => ['exists:ingredients,name'],
@@ -146,7 +158,7 @@ trait Submit
 
                     try {
                         // Combine date + slot start time
-                        $selectedDateTime = Carbon::parse($value . ' ' . $time);
+                        $selectedDateTime = Carbon::parse($value.' '.$time);
                     } catch (\Exception $e) {
                         return $fail('Invalid starting date or delivery time.');
                     }
@@ -157,7 +169,7 @@ trait Submit
                     if ($selectedDateTime->lt($minAllowed)) {
                         $fail('We need at least 24 hours to prepare your first batch.');
                     }
-                }
+                },
             ],
 
             // যোগাযোগ ও ঠিকানা
@@ -181,9 +193,10 @@ trait Submit
 
         // 3. load plan
         $plan = Plan::find($this->selected_plan_id);
-        if (!$plan) {
+        if (! $plan) {
             $this->addError('selected_plan_id', 'Selected plan not found.');
             $this->dispatch('toast', message: 'Selected plan not found.', type: 'error');
+
             return;
         }
 
@@ -201,10 +214,11 @@ trait Submit
 
         try {
             // $start is a Carbon instance (date + slot time)
-            $start = Carbon::parse($startingDate . ' ' . $time);
+            $start = Carbon::parse($startingDate.' '.$time);
         } catch (\Exception $e) {
             $this->addError('starting_date', 'Invalid starting date.');
             $this->dispatch('toast', message: 'Invalid starting date.', type: 'error');
+
             return;
         } // OPTIONAL CHECK CODE END
 
@@ -215,7 +229,6 @@ trait Submit
         // DB-তে সেভ করার জন্য উপযুক্ত ফরম্যাট
         $this->starting_date = $start->toDateString();   // 'YYYY-MM-DD'
         $this->expires_date = $expires->toDateString(); // 'YYYY-MM-DD'
-
 
         // 4. Promo handling and safe save inside transaction
         $promoCodeString = $this->promo_code ?: null;
@@ -237,7 +250,6 @@ trait Submit
                 if ($existing) {
                     throw new \Exception('You already have an active subscription that has not yet expired.');
                 }
-
 
                 $promo = null;
                 if ($promoCodeString) {
@@ -297,9 +309,9 @@ trait Submit
 
                 // ধরছি $this->allergens হচ্ছে mixed input (names as strings)
                 $names = collect($this->allergens)
-                    ->map(fn($i) => is_string($i) ? trim($i) : (is_object($i) && isset($i->name) ? trim($i->name) : null))
+                    ->map(fn ($i) => is_string($i) ? trim($i) : (is_object($i) && isset($i->name) ? trim($i->name) : null))
                     ->filter()               // remove null/empty
-                    ->map(fn($n) => mb_strtolower($n)) // optional: lowercase normalization
+                    ->map(fn ($n) => mb_strtolower($n)) // optional: lowercase normalization
                     ->unique()
                     ->values()
                     ->toArray();
@@ -320,6 +332,9 @@ trait Submit
                     null // or pass integer limit
                 );
 
+                Notification::route('mail', env('ADMIN_EMAIL'))
+                    ->notify(new NewSubscriptionNotification($subscriber, $subscriber->created_at));
+
             });
         } catch (\Exception $e) {
             \Log::error('Subscriber create failed', ['error' => $e->getMessage(), 'user_id' => $userId ?? null]);
@@ -330,14 +345,20 @@ trait Submit
             } else {
                 $this->addError('submission', $msg);
             }
+
             return;
         }
-
 
         // 5. success
         $this->dispatch('toast', message: 'Successfully submitted', type: 'success');
 
-        activity()->causedBy(auth()->user())->withProperties(['describe'=>request()->ip()])->log('Plan subscribed');
+        $user = auth()->user();
+
+        activity()->causedBy($user)->withProperties(['describe' => request()->ip()])->log('Plan subscribed');
+
+        $planName = $plan->planCategory->name;
+
+        Mail::to($user->email)->send(new UserSubscribedMail($user, $planName));
 
         $this->resetValidation();
         RateLimiter::clear($key);
