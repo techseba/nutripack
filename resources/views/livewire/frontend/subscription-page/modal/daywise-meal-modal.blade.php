@@ -178,7 +178,8 @@
                                                         @endif
                                                     </button>
 
-                                                    <a href="{{ route('meal.preview', ['id' => $meal['id']]) }}" wire:navigate
+                                                    <a href="{{ route('meal.preview', ['id' => $meal['id']]) }}"
+                                                        wire:navigate
                                                         class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-100 transition">
                                                         Preview
                                                     </a>
@@ -193,6 +194,65 @@
                     @endforeach
                 @endif
             </div>
+
+            @php
+
+                $carbon = Carbon\Carbon::parse($selectedDate)->setTimezone(config('app.timezone'));
+                $this->filterDate = $carbon->toDateString(); // canonical date used by loadSelectedMeals()
+                $this->selectedDate = $carbon->format('d F Y'); // display-friendly
+
+                // Load meals for UI
+                $meals = App\Models\DayWiseMeal::with(['meal', 'mealType'])
+                    ->whereDate('date', $carbon->toDateString())
+                    ->get();
+
+                $mealsByType = $meals->groupBy('meal_type_id');
+
+
+                $subscriber = App\Models\Subscriber::with(['plan.planCategory.mealTypes', 'deliveryDays'])
+                    ->where('user_id', $this->userId)
+                    ->where('status', 'active')
+                    ->where('expires_date', '>=', now())
+                    ->orderBy('starting_date', 'desc')
+                    ->first();
+
+                $subscriberMealTypes = $subscriber?->plan?->planCategory?->mealTypes ?? collect();
+
+                $subscriberMealTypes = $subscriberMealTypes ?? collect();
+
+                $grouped = collect();
+
+                foreach ($subscriberMealTypes as $mealType) {
+                    $items = collect($mealsByType->get($mealType->id, []))
+                        ->map(function ($row) {
+                            return [
+                                'id' => $row->meal->id ?? null,
+                                'name' => $row->meal->name ?? '-',
+                                'image' => $row->meal->image ?? null,
+                                'meal_type_id' => $row->meal_type_id ?? null,
+                            ];
+                        })
+                        ->values()
+                        ->toArray();
+
+                    if (!empty($items)) {
+                        $grouped[$mealType->name] = $items;
+                    }
+                }
+
+                $groupedMeals = $grouped->toArray();
+            @endphp
+
+            @foreach ($groupedMeals as $mealTypeName => $meals)
+                <p>Meal Type : {{ $mealTypeName }}</p>
+
+                @foreach ($meals ?? [] as $meal)
+                    <div>
+
+                        <p>Meal Name : {{ $meal['name'] }}</p>
+                    </div>
+                @endforeach
+            @endforeach
 
         </div>
 
