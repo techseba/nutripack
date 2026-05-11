@@ -178,18 +178,10 @@
                                                         @endif
                                                     </button>
 
-                                                    <div x-data="{ open: @entangle('showPreview') }" x-cloak>
-                                                        {{-- আপনার লুপে থাকা বাটন (আপনি ইতিমধ্যে ব্যবহার করছেন) --}}
-                                                        <button type="button"
-                                                            wire:click.prevent="openPreview({{ $meal['id'] }})"
-                                                            class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-100 transition"
-                                                            aria-label="Preview {{ $meal['name'] }}">
-                                                            Preview
-                                                        </button>
-
-                                                        {{-- Modal --}}
-                                                        @include('frontend.subscription-page.modal.open-preview-daywise-meal')
-                                                    </div>
+                                                    <a href="{{ route('meal.preview', ['id' => $meal['id']]) }}" wire:navigate
+                                                        class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-100 transition">
+                                                        Preview
+                                                    </a>
 
                                                 </div>
                                             </div>

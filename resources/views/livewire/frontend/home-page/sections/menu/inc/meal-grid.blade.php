@@ -4,8 +4,8 @@
             <div x-show="meal_type === 'all' || meal_type === '{{ strtolower($menu->mealType->name) }}'"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90"
                 x-transition:enter-end="opacity-100 scale-100"
-                class="card-hover bg-white border border-emerald-500/50 rounded-3xl overflow-hidden flex flex-col group cursor-pointer"
-                wire:click.prevent="show({{ $menu->id }})">
+                class="card-hover bg-white border border-emerald-500/50 rounded-3xl overflow-hidden flex flex-col group"
+                >
 
                 {{-- item --}}
                 <div class="grid grid-cols-2">
@@ -51,9 +51,9 @@
                                 {{ $menu->name }}</h3>
                         </div>
 
-                        <button
+                        <a href="{{ route('meal.preview', $menu->id) }}" wire:navigate
                             class="bg-amber-400 hover:bg-amber-500 transition-colors cursor-pointer text-slate-800 py-1.5 px-2 w-30 uppercase text-xs font-medium rounded-sm shadow-md">more
-                            details</button>
+                            details</a>
 
                         <!-- Description -->
                         <p class="text-slate-500 text-xs mt-3">{{ $menu->description }}</p>

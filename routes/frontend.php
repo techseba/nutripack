@@ -2,6 +2,7 @@
 
 use App\Livewire\Frontend\HelpPage\HelpIndex;
 use App\Livewire\Frontend\HomePage\HomeIndex;
+use App\Livewire\Frontend\MealPreviewPage\MealPreviewIndex;
 use App\Livewire\Frontend\PlanDetailsPage\PlanDetailsIndex;
 use App\Livewire\Frontend\PrivacyPolicyPage\PrivacyPolicyIndex;
 use App\Livewire\Frontend\SubscriptionPage\SubscriptionIndex;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', HomeIndex::class)->name('home')->middleware('redirect.if.subscribed');
+
+Route::get('/meal/{id}', MealPreviewIndex::class)->name('meal.preview');
 
 Route::get('/plan', PlanDetailsIndex::class)->middleware('auth')->name('plan');
 

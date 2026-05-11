@@ -35,6 +35,18 @@
     {{ $slot }} --}}
 
     <x-footer />
+
+    <script>
+        // রাইট-ক্লিক বন্ধ করার জন্য
+        // document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // কপি (Ctrl+C) বন্ধ করার জন্য
+        // document.addEventListener('copy', event => event.preventDefault());
+
+        // সিলেক্ট করা বন্ধ করার জন্য
+        document.addEventListener('selectstart', event => event.preventDefault());
+    </script>
+
     @livewireScripts
 </body>
 
