@@ -14,11 +14,14 @@
                         </div>
                     </label>
                 </x-table.th>
-                <x-table.th>date</x-table.th>
+                <x-table.th class="w-15">ID</x-table.th>
+                <x-table.th class="w-20">Date</x-table.th>
+                <x-table.th class="w-15">S_ID</x-table.th>
+                <x-table.th>subscriber name</x-table.th>
                 <x-table.th>meal name</x-table.th>
-                <x-table.th>quantity</x-table.th>
                 <x-table.th>meal type</x-table.th>
-                {{-- <x-table.th class="w-20">actions</x-table.th> --}}
+                <x-table.th>created at</x-table.th>
+                <x-table.th class="w-20">actions</x-table.th>
             </x-table.tr>
         </thead>
         <tbody>
@@ -37,12 +40,14 @@
                             </div>
                         </label>
                     </x-table.td>
+                    <x-table.td>{{ $row->id }}</x-table.td>
                     <x-table.td><x-widget.date :value="$row->date" /></x-table.td>
-                    <x-table.td>{!! highlight($row->meal->name, $this->search) !!}</x-table.td>
-                    <x-table.td>{{ $row->qty }}</x-table.td>
-                    <x-table.td>{!! highlight($row->meal->mealType->name, $this->search) !!}</x-table.td>
-
-                    {{-- <x-table.td>
+                    <x-table.td>{{ $row->subscriber->id }}</x-table.td>
+                    <x-table.td>{{ $row->subscriber->user->name }}</x-table.td>
+                    <x-table.td>{{ $row->meal->name }}</x-table.td>
+                    <x-table.td>{{ $row->mealType->name }}</x-table.td>
+                    <x-table.td><x-widget.date-time :value="$row->created_at" /></x-table.td>
+                    <x-table.td>
                         <div class="flex justify-end gap-2">
                             <button wire:click.prevent="edit({{ $row->id }})"
                                 class="text-green-500 hover:text-green-400 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
@@ -54,12 +59,11 @@
                                 <x-icons.delete size="16" />
                             </button>
                         </div>
-                    </x-table.td> --}}
-
+                    </x-table.td>
                 </x-table.tr>
             @empty
                 <x-table.tr>
-                    <x-table.td colspan="6" class="text-center">{{ ucfirst($subject) ?? 'Item' }} was not
+                    <x-table.td colspan="12" class="text-center">{{ ucfirst($subject) ?? 'Item' }} was not
                         found.</x-table.td>
                 </x-table.tr>
             @endforelse

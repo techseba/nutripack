@@ -22,7 +22,7 @@
             </x-table.tr>
         </thead>
         <tbody>
-            @forelse ($this->rows as $row)
+            @forelse ($this->rowsAD as $row)
                 <x-table.tr>
                     <x-table.td>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -63,6 +63,54 @@
                         found.</x-table.td>
                 </x-table.tr>
             @endforelse
+        </tbody>
+    </table>
+
+    <table class="w-full mt-10">
+        <thead>
+            <x-table.tr thead>
+                <x-table.th class="w-10">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" wire:model.live="selectAll" class="peer sr-only" />
+                        <div
+                            class="h-4 w-4 rounded-md border border-zinc-600 peer-checked:border-red-600
+                                            peer-checked:bg-red-600 flex items-center justify-center
+                                            transition-all duration-75 ease-in-out
+                                            peer-hover:border-red-500">
+                            <x-icons.check class="" size="10" />
+                        </div>
+                    </label>
+                </x-table.th>
+                <x-table.th>date</x-table.th>
+                <x-table.th>meal name</x-table.th>
+                <x-table.th>quantity</x-table.th>
+                <x-table.th>meal type</x-table.th>
+                {{-- <x-table.th class="w-20">actions</x-table.th> --}}
+            </x-table.tr>
+        </thead>
+        <tbody>
+            @forelse ($this->combinedRows as $row)
+    <x-table.tr>
+        <x-table.td>
+            <input type="checkbox" wire:model.live="selected" value="{{ $row->id }}" />
+        </x-table.td>
+
+        <x-table.td><x-widget.date :value="$row->date" /></x-table.td>
+
+        <x-table.td>{!! highlight($row->meal_name, $this->search) !!}</x-table.td>
+
+        <x-table.td>{{ $row->qty }}</x-table.td>
+
+        <x-table.td>{!! highlight($row->meal_type_name ?? '—', $this->search) !!}</x-table.td>
+    </x-table.tr>
+@empty
+    <x-table.tr>
+        <x-table.td colspan="6" class="text-center">No records found.</x-table.td>
+    </x-table.tr>
+@endforelse
+
+{{ $this->combinedRows->links() }}
+
         </tbody>
     </table>
 </div>

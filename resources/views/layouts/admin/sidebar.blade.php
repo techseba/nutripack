@@ -127,6 +127,14 @@
 
                 @can('meal.view')
                     {{-- day wise meals --}}
+                    <flux:sidebar.item icon="users" :href="route('admin.subscriber-additional-meals')"
+                        :current="request()->routeIs('admin.subscriber-additional-meals')" wire:navigate>
+                        {{ __('Subscriber AD Meals') }}
+                    </flux:sidebar.item>
+                @endcan
+
+                @can('meal.view')
+                    {{-- day wise meals --}}
                     <flux:sidebar.item icon="promo-codes" :href="route('admin.promo-codes')"
                         :current="request()->routeIs('admin.promo-codes')" wire:navigate>
                         {{ __('Promo Codes') }}

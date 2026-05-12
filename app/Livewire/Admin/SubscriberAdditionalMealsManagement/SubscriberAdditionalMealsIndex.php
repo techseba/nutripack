@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire\Admin\SubscriberMealsManagement;
+namespace App\Livewire\Admin\SubscriberAdditionalMealsManagement;
 
 use App\Models\DietPlan;
 use App\Models\Meal;
 use App\Models\MealType;
-use App\Models\SubscriberMealSelection;
+use App\Models\SubscriberAdditionalMealSelection;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -16,9 +16,10 @@ use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
-#[Title('Subscriber Meals Management')]
-class SubscriberMealsIndex extends Component
+#[Title('Subscriber Additional Meals Management')]
+class SubscriberAdditionalMealsIndex extends Component
 {
+
     /*
     |--------------------------------------------------------------------------
     | 1. Traits
@@ -36,7 +37,7 @@ class SubscriberMealsIndex extends Component
     */
 
     // ===== Page Meta =====
-    public string $subject = 'subscriber meal';
+    public string $subject = 'subscriber additional meal';
 
     // ===== Filters =====
     public string $search = '';
@@ -104,7 +105,7 @@ class SubscriberMealsIndex extends Component
     #[Computed]
     public function rowsQuery(): Builder
     {
-        return SubscriberMealSelection::query()
+        return SubscriberAdditionalMealSelection::query()
             ->with(['subscriber.user', 'mealType', 'meal'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -154,7 +155,7 @@ class SubscriberMealsIndex extends Component
     public function edit(int $id)
     {
         // Selecting specific table row with specific ID
-        $selectedTableRow = SubscriberMealSelection::with(['subscriber.user', 'mealType', 'meal'])->findOrFail($id);
+        $selectedTableRow = SubscriberAdditionalMealSelection::with(['subscriber.user', 'mealType', 'meal'])->findOrFail($id);
 
         // Assigning field properties values ​​from database values
         $this->date = Carbon::parse($selectedTableRow->date)->format('Y-m-d');
@@ -183,7 +184,7 @@ class SubscriberMealsIndex extends Component
 
             $this->authorize('diet-plan.edit');
 
-            $SubscriberMealSelection = SubscriberMealSelection::findOrFail($this->editRow);
+            $SubscriberAdditionalMealSelection = SubscriberAdditionalMealSelection::findOrFail($this->editRow);
 
             $this->validate([
                 'date'              => ['required','string','max:40'],
@@ -201,7 +202,7 @@ class SubscriberMealsIndex extends Component
 
 
 
-            $SubscriberMealSelection->update($data);
+            $SubscriberAdditionalMealSelection->update($data);
 
             $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
 
@@ -257,7 +258,7 @@ class SubscriberMealsIndex extends Component
     {
         $this->authorize('diet-plan.delete');
 
-        SubscriberMealSelection::whereKey($id)->delete();
+        SubscriberAdditionalMealSelection::whereKey($id)->delete();
 
         $this->dispatch('toast', message: ucfirst($this->subject) . ' deleted successfully', type: 'success');
 
@@ -277,7 +278,7 @@ class SubscriberMealsIndex extends Component
             return;
         }
 
-        SubscriberMealSelection::whereIn('id', $this->selected)->delete();
+        SubscriberAdditionalMealSelection::whereIn('id', $this->selected)->delete();
 
         $this->dispatch('toast', message: count($this->selected) . ' ' . ucfirst($this->subject) . ' deleted successfully!', type: 'success');
 
@@ -328,12 +329,8 @@ class SubscriberMealsIndex extends Component
 
         $this->resetPage();
     }
-
     public function render()
     {
-        $this->authorize('diet-plan.view');
-
-        return view('livewire.admin.subscriber-meals-management.subscriber-meals-index');
+        return view('livewire.admin.subscriber-additional-meals-management.subscriber-additional-meals-index');
     }
 }
-

@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin\SubscriberManagement;
 
-use App\Models\PromoCode;
 use App\Models\Subscriber;
 use App\Models\User;
 use Carbon\Carbon;

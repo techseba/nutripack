@@ -16,6 +16,7 @@ use App\Livewire\Admin\PlanCategoryManagement\PlanCategoryIndex;
 use App\Livewire\Admin\PlanManagement\PlanIndex;
 use App\Livewire\Admin\PromoCodeManagement\PromoCodeIndex;
 use App\Livewire\Admin\RoleManagement\RoleIndex;
+use App\Livewire\Admin\SubscriberAdditionalMealsManagement\SubscriberAdditionalMealsIndex;
 use App\Livewire\Admin\SubscriberManagement\SubscriberIndex;
 use App\Livewire\Admin\SubscriberMealsManagement\SubscriberMealsIndex;
 use App\Livewire\Admin\UserManagement\UserIndex;
@@ -43,6 +44,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->as('admin.')->group( f
 
     Route::get('subscribers', SubscriberIndex::class)->name('subscribers');
     Route::get('subscriber-meals', SubscriberMealsIndex::class)->name('subscriber-meals');
+    Route::get('subscriber-additional-meals', SubscriberAdditionalMealsIndex::class)->name('subscriber-additional-meals');
 
     Route::get('promo-codes', PromoCodeIndex::class)->name('promo-codes');
 

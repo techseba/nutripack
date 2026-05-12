@@ -328,14 +328,14 @@
                                                     @php $mealTypeId = $meal['meal_type_id'] ?? $meal['mealType']['id'] ?? null; @endphp
 
                                                     <button
-                                                        @click="$dispatch('open-select-modal', { id: {{ $meal['id'] }} })"
-                                                        @if (isset($lockedMealTypes[$mealTypeId]) && $lockedMealTypes[$mealTypeId]) disabled class="opacity-90 cursor-not-allowed" @endif
+                                                        @click="$dispatch('open-select-adm-modal', { id: {{ $meal['id'] }} })"
+                                                        @if (isset($lockedMealTypesAD[$mealTypeId]) && $lockedMealTypesAD[$mealTypeId]) disabled class="opacity-90 cursor-not-allowed" @endif
                                                         aria-label="Select {{ $meal['name'] }}">
 
                                                         {{-- Select (only show when NOT selected and NOT locked) --}}
                                                         @if (
-                                                            !(isset($selectedMeals[$mealTypeId]) && $selectedMeals[$mealTypeId] == $meal['id']) &&
-                                                                !(isset($lockedMealTypes[$mealTypeId]) && $lockedMealTypes[$mealTypeId]))
+                                                            !(isset($selectedMealsAD[$mealTypeId]) && $selectedMealsAD[$mealTypeId] == $meal['id']) &&
+                                                                !(isset($lockedMealTypesAD[$mealTypeId]) && $lockedMealTypesAD[$mealTypeId]))
                                                             <div
                                                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-md shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition">
                                                                 <x-icons.mouse size="16" />
@@ -343,7 +343,7 @@
                                                             </div>
                                                         @endif
 
-                                                        @if (isset($selectedMeals[$mealTypeId]) && $selectedMeals[$mealTypeId] == $meal['id'])
+                                                        @if (isset($selectedMealsAD[$mealTypeId]) && $selectedMealsAD[$mealTypeId] == $meal['id'])
                                                             <div
                                                                 class="inline-flex items-center gap-1 text-green-500 text-xs font-medium focus:outline-none">
                                                                 <x-icons.alarm size="16" />
@@ -351,7 +351,7 @@
                                                             </div>
                                                         @endif
 
-                                                        @if (isset($lockedMealTypes[$mealTypeId]) && $lockedMealTypes[$mealTypeId])
+                                                        @if (isset($lockedMealTypesAD[$mealTypeId]) && $lockedMealTypesAD[$mealTypeId])
                                                             <div
                                                                 class="absolute right-2 top-1 inline-flex items-center gap-1 text-red-500 text-xs font-medium">
                                                                 <x-icons.lock size="13" />
@@ -383,6 +383,7 @@
 
 
     @include('frontend.subscription-page.modal.select-confirmation')
+    @include('frontend.subscription-page.modal.select-adm-confirmation')
     <!-- Actions -->
     <div
         class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-emerald-500/80 backdrop-blur-xs text-white py-2 shadow-inner flex justify-around space-x-10 rounded-ss-xl rounded-se-xl z-50">
