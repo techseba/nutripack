@@ -20,6 +20,7 @@ trait Submit
 {
     public function submit()
     {
+        // dd($this->mealTypes);
         // assign userId
         $userId = auth()->id();
 
@@ -331,6 +332,8 @@ trait Submit
                     $this->expires_date,
                     null // or pass integer limit
                 );
+
+                $subscriber->mealTypes()->sync($this->mealTypes);
 
                 Notification::route('mail', env('ADMIN_EMAIL'))
                     ->notify(new NewSubscriptionNotification($subscriber, $subscriber->created_at));

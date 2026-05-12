@@ -3121,6 +3121,8 @@ namespace App\Models {
      * @property-read mixed $duration_days
      * @property-read \App\Models\Plan $plan
      * @property-read \App\Models\User $user
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MealType> $mealTypes
+     * @property-read int|null $meal_types_count
      * @property-read \App\Models\PromoCode $promoCode
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriberDeliveryDay> $deliveryDays
      * @property-read int|null $delivery_days_count

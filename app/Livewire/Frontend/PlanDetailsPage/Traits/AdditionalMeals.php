@@ -3,26 +3,41 @@
 namespace App\Livewire\Frontend\PlanDetailsPage\Traits;
 
 use App\Models\AdditionalMeal;
+use App\Models\MealType;
 
 trait AdditionalMeals
 {
     public $hasBreakfast;
+
     public $breakfastMaxQuantity;
+
     public $breakfastUnitPrice;
+
     public $breakfastQuantity = 0;
+
     public $breakfastTotalPrice;
 
     public $hasLunch;
+
     public $lunchMaxQuantity;
+
     public $lunchUnitPrice;
+
     public $lunchQuantity = 0;
+
     public $lunchTotalPrice;
 
     public $hasSalad;
+
     public $saladMaxQuantity;
+
     public $saladUnitPrice;
+
     public $saladQuantity = 0;
+
     public $saladTotalPrice;
+
+    public $mealTypes = [];
 
     public $totalAdditionalPrice;
 
@@ -52,6 +67,28 @@ trait AdditionalMeals
         $this->saladTotalPrice = 0;
 
         $this->totalAdditionalPrice = 0;
+
+        $this->mealTypes = collect($this->mealTypes ?? []);
+
+        if ($this->breakfastQuantity > 0) {
+            $this->mealTypes = $this->mealTypes->merge(
+                MealType::where('name', 'Breakfast')->pluck('id')
+            );
+        }
+
+        if ($this->lunchQuantity > 0) {
+            $this->mealTypes = $this->mealTypes->merge(
+                MealType::where('name', 'Lunch')->pluck('id')
+            );
+        }
+
+        if ($this->saladQuantity > 0) {
+            $this->mealTypes = $this->mealTypes->merge(
+                MealType::where('name', 'Salad')->pluck('id')
+            );
+        }
+
+        $this->mealTypes = $this->mealTypes->unique()->values()->all();
 
         // Breakfast সেট করা (DB থেকে)
         if (isset($additionalMealTypes['Breakfast'])) {

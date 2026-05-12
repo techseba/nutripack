@@ -217,8 +217,9 @@
                     ->first();
 
                 $subscriberMealTypes = $subscriber?->plan?->planCategory?->mealTypes ?? collect();
+                $mealTypes = $subscriber?->mealTypes ?? collect();
 
-                $mealTypes = App\Models\MealType::where('name', 'Breakfast')->orWhere('name','Salad')->get();
+                // $mealTypes = App\Models\MealType::where('name', 'Breakfast')->orWhere('name','Salad')->get();
 
                 // dd($mealTypes);
 

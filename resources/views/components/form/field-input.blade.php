@@ -62,7 +62,7 @@
             </button>
         </div>
     @else
-        <input type="{{ $type }}" id="{{ $inputId }}"
+        <input type="{{ $type }}" step="any" id="{{ $inputId }}"
             @if ($model) wire:model.defer="{{ $model }}" @endif @if($disabled) disabled @endif
             {{ $attributes->merge([
                 'class' => $baseClass . ' ' . ($errors->has($model) ? $errorClass : $normalClass),

@@ -106,6 +106,11 @@ class Subscriber extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function mealTypes()
+    {
+        return $this->belongsToMany(MealType::class, 'subscriber_additional_meal_type');
+    }
+
     public function promoCode()
     {
         return $this->belongsTo(PromoCode::class, 'promo_code_id');

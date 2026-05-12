@@ -234,6 +234,7 @@ class PlanCategoryIndex extends Component
     // This function is storing and updating data in a specific table.
     public function save()
     {
+        // dd($this->mealTypes);
         // Sanitizing form data
         $this->sanitize();
 
