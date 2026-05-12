@@ -18,6 +18,7 @@
                 <x-table.th>name</x-table.th>
                 <x-table.th>phone</x-table.th>
                 <x-table.th>plan category</x-table.th>
+                <x-table.th>additional meals</x-table.th>
                 <x-table.th>start date</x-table.th>
                 <x-table.th>expiry date</x-table.th>
                 <x-table.th>total bill</x-table.th>
@@ -54,6 +55,11 @@
                         </a>
                     </x-table.td>
                     <x-table.td>{{ $row->plan->planCategory->name }}</x-table.td>
+                    <x-table.td>
+                        @foreach ($row->mealTypes as $mealType)
+                            <div class="text-sm capitalize">{{ $mealType->name }}</div>
+                        @endforeach
+                    </x-table.td>
                     <x-table.td><x-widget.date :value="$row->starting_date" /></x-table.td>
 
                     @php
@@ -118,10 +124,10 @@
                     <x-table.td>
                         <div class="flex justify-end gap-2">
 
-                            <button wire:click.prevent="singleView({{ $row->id }})"
+                            {{-- <button wire:click.prevent="singleView({{ $row->id }})"
                                 class="text-blue-500 hover:text-blue-400 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">
                                 <x-icons.notepad-text size="17" />
-                            </button>
+                            </button> --}}
 
                             <button wire:click.prevent="edit({{ $row->id }})"
                                 class="text-green-500 hover:text-green-400 p-1 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors duration-300 cursor-pointer">

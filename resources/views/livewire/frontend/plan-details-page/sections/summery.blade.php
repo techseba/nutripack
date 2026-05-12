@@ -38,8 +38,8 @@
 
         @if ($selectedPlan)
             @php
-                $startDate = Carbon\Carbon::parse($this->starting_date);
-                $expiresDate = Carbon\Carbon::parse($this->starting_date)
+                $startDate = Carbon\Carbon::parse($this->starting_date)->startOfDay();
+                $expiresDate = Carbon\Carbon::parse($this->starting_date)->endOfDay()
                     ->addDays($selectedPlan->planCategory->days_of_plan)
                     ->subDays(1);
 

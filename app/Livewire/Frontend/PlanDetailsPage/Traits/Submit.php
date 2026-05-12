@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Frontend\PlanDetailsPage\Traits;
 
+use App\Mail\NewSubscriptionMail;
 use App\Mail\UserSubscribedMail;
+use App\Models\AdditionalMeal;
 use App\Models\Plan;
 use App\Models\PromoCode;
 use App\Models\Subscriber;
@@ -231,9 +233,33 @@ trait Submit
         $this->starting_date = $start->toDateString();   // 'YYYY-MM-DD'
         $this->expires_date = $expires->toDateString(); // 'YYYY-MM-DD'
 
+        if ($this->breakfastQuantity > 0) {
+            $additionalMealBreakfast = AdditionalMeal::where('name', 'Breakfast')->first();
+            $additionalMealBreakfastPrice = $additionalMealBreakfast->unit_price * $this->planDays;
+        } else {
+            $additionalMealBreakfastPrice = 0;
+        }
+
+        if ($this->lunchQuantity > 0) {
+            $additionalMealLunch = AdditionalMeal::where('name', 'Lunch')->first();
+            $additionalMealLunchPrice = $additionalMealLunch->unit_price * $this->planDays;
+        } else {
+            $additionalMealLunchPrice = 0;
+        }
+
+        if ($this->saladQuantity > 0) {
+            $additionalMealSalad = AdditionalMeal::where('name', 'Salad')->first();
+            $additionalMealSaladPrice = $additionalMealSalad->unit_price * $this->planDays;
+        } else {
+            $additionalMealSaladPrice = 0;
+        }
+
+        $totalAdditionalMealPrice = $additionalMealBreakfastPrice + $additionalMealLunchPrice + $additionalMealSaladPrice;
+
+
         // 4. Promo handling and safe save inside transaction
         $promoCodeString = $this->promo_code ?: null;
-        $subtotal = (float) $plan->price;
+        $subtotal = (float) $plan->price + $totalAdditionalMealPrice;
         $discount_amount = 0.00;
         $finalTotal = $subtotal;
         $promoId = null;
@@ -337,6 +363,8 @@ trait Submit
 
                 Notification::route('mail', env('ADMIN_EMAIL'))
                     ->notify(new NewSubscriptionNotification($subscriber, $subscriber->created_at));
+
+                // Mail::to(env('ADMIN_EMAIL'))->send(new NewSubscriptionMail($subscriber));
 
             });
         } catch (\Exception $e) {
