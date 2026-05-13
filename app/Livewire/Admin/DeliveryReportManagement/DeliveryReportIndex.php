@@ -10,8 +10,6 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithoutUrlPagination;
-use Livewire\WithPagination;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Title('Delivery Report Management')]
@@ -22,9 +20,6 @@ class DeliveryReportIndex extends Component
     | 1. Traits
     |--------------------------------------------------------------------------
     */
-
-    // ===== For Livewire Pagination =====
-    use WithPagination, WithoutUrlPagination;
     use AuthorizesRequests;
 
     /*
@@ -39,16 +34,6 @@ class DeliveryReportIndex extends Component
     // ===== Filters =====
     public string $search = '';
 
-    // ===== Table State =====
-    public array $selected = [];
-    public bool $selectAll = false;
-    public int $perPage = 5;
-
-    // ===== Form State =====
-    public bool $isEdit = false;
-    public ?int $editRow = null;
-
-
     /*
     |--------------------------------------------------------------------------
     | 3. Lifecycle Hooks
@@ -60,37 +45,6 @@ class DeliveryReportIndex extends Component
         $this->search = Carbon::now()->toDateString();
     }
 
-    // This function will reset the page once after searching.
-    public function updatedSearch()
-    {
-        $this->resetPage();
-        $this->resetSelection();
-    }
-
-    // this method will
-    public function updatedSelectAll($value)
-    {
-        if ($value) {
-            $this->selected = $this->rows
-                ->pluck('id')
-                ->toArray();
-        } else {
-            $this->selected = [];
-        }
-    }
-
-    public function updatedSelected()
-    {
-        $rowCount = $this->rows->count();
-
-        $this->selectAll = $rowCount > 0 && count($this->selected) === $rowCount;
-    }
-
-    public function updatedPage()
-    {
-        $this->resetSelection();
-    }
-
     /*
     |--------------------------------------------------------------------------
     | 4. Computed Properties
@@ -98,50 +52,93 @@ class DeliveryReportIndex extends Component
     */
 
     #[Computed()]
-    public function deliveryRows(): Collection
-    {
-        $date = $this->filterDate ?? now()->toDateString();
+public function deliveryRows(): Collection
+{
+    // date filter: filterDate ব্যবহার করলে সেটি নিন, নাহলে $this->search বা today
+    $date = $this->filterDate ?? $this->search ?? now()->toDateString();
 
-        $selections = SubscriberMealSelection::with(['subscriber.user', 'meal'])
-            ->whereDate('date', $date)
-            ->when($this->search, function ($q) {
-                $q->whereHas('subscriber.user', function ($sq) {
-                    $sq->where('name', 'like', "%{$this->search}%");
-                })->orWhereHas('subscriber', function ($sq) {
-                    $sq->where('phone', 'like', "%{$this->search}%");
-                })->orWhere('date', 'like', "%{$this->search}%");
-            })
-            ->get();
+    // Main selections
+    $mainSelections = SubscriberMealSelection::with(['subscriber.user', 'meal'])
+        ->when($date, fn($q) => $q->whereDate('date', $date))
+        ->when($this->search, function ($q) {
+            $q->whereHas('subscriber.user', function ($sq) {
+                $sq->where('name', 'like', "%{$this->search}%");
+            })->orWhereHas('subscriber', function ($sq) {
+                $sq->where('phone', 'like', "%{$this->search}%");
+            })->orWhere('date', 'like', "%{$this->search}%");
+        })
+        ->get();
 
-        $grouped = $selections->groupBy(function ($item) {
-            return $item->subscriber_id . '|' . $item->date;
-        });
+    // Additional selections
+    $additionalSelections = \App\Models\SubscriberAdditionalMealSelection::with(['subscriber.user', 'meal'])
+        ->when($date, fn($q) => $q->whereDate('date', $date))
+        ->when($this->search, function ($q) {
+            $q->whereHas('subscriber.user', function ($sq) {
+                $sq->where('name', 'like', "%{$this->search}%");
+            })->orWhereHas('subscriber', function ($sq) {
+                $sq->where('phone', 'like', "%{$this->search}%");
+            })->orWhere('date', 'like', "%{$this->search}%");
+        })
+        ->get();
 
-        $rows = $grouped->map(function ($group) {
-            $first = $group->first();
-            $user = $first->subscriber->user ?? null;
+    // Merge collections
+    $all = $mainSelections->concat($additionalSelections);
 
-            // delivery status: if any selection has delivered_at set, mark delivered (customize as needed)
-            $delivered = $group->contains(fn($s) => !empty($s->delivered_at));
-            $deliveredAt = $group->pluck('delivered_at')->filter()->first();
+    // Group by subscriber_id + date
+    $grouped = $all->groupBy(function ($item) {
+        return $item->subscriber_id . '|' . $item->date;
+    });
 
-            return (object) [
-                'id' => $first->id,
-                'date' => $first->date,
-                'subscriber_id' => $first->subscriber_id,
-                'subscriber_name' => $user->name ?? ($first->subscriber->name ?? '—'),
-                'subscriber_phone' => $user->phone ?? ($first->subscriber->phone ?? '—'),
-                'subscriber_address' => collect([$first->subscriber->house, $first->subscriber->road, $first->subscriber->area, $first->subscriber->additional_direction])
-                    ->filter()->implode(', '),
-                'delivery_status' => $delivered ? 'Delivered' : 'Pending',
-                'delivered_at' => $first->subscriber->delivery_time,
-                // 'delivery_person' => $first->deliveryPerson->name ?? null, // ensure relation exists
-                'meal_names' => $group->pluck('meal.name')->filter()->values()->all(),
-            ];
-        })->values();
+    // Map groups to rows
+    $rows = $grouped->map(function ($group) {
+        $first = $group->first();
+        $user = $first->subscriber->user ?? null;
 
-        return $rows;
-    }
+        // === Meal counting: countBy() gives correct counts per meal name ===
+        $mealCounts = $group->pluck('meal.name')
+            ->filter()            // remove nulls
+            ->countBy()           // Collection: ['Chicken' => 2, 'Rice' => 1]
+            ->toArray();
+
+        // Convert to string array for easy display / PDF implode
+        $mealNamesWithCount = collect($mealCounts)->map(function ($count, $name) {
+            return "{$name} ({$count})";
+        })->values()->all();
+
+        // Delivery status: যদি কোনো সিলেকশনে delivered_at থাকে সেটাকে delivered ধরে নিন
+        $delivered = $group->contains(fn($s) => ! empty($s->delivered_at));
+        // Prefer the latest delivered_at if multiple
+        $deliveredAt = $group->pluck('delivered_at')->filter()->sort()->last() ?? null;
+
+        // Optionally delivery person (if relation exists on selection)
+        $deliveryPerson = null;
+        if ($group->first()->relationLoaded('deliveryPerson') || isset($group->first()->delivery_person_id)) {
+            // adjust according to your relation/field names
+            $deliveryPerson = $group->pluck('deliveryPerson')->filter()->first()?->name ?? null;
+        }
+
+        return (object) [
+            'id' => $first->id,
+            'date' => $first->date,
+            'subscriber_id' => $first->subscriber_id,
+            'subscriber_name' => $user->name ?? ($first->subscriber->name ?? '—'),
+            'subscriber_phone' => $user->phone ?? ($first->subscriber->phone ?? '—'),
+            'subscriber_address' => collect([
+                $first->subscriber->house,
+                $first->subscriber->road,
+                $first->subscriber->area,
+                $first->subscriber->additional_direction
+            ])->filter()->implode(', '),
+            'delivery_status' => $delivered ? 'Delivered' : 'Pending',
+            'delivered_at' => $deliveredAt ?? ($first->subscriber->delivery_time ?? null),
+            'delivery_person' => $deliveryPerson,
+            'meal_names' => $mealNamesWithCount, // array of strings: ["Chicken (2)", "Rice (1)"]
+        ];
+    })->values();
+
+    return $rows;
+}
+
 
     /*
     |--------------------------------------------------------------------------
@@ -157,12 +154,12 @@ class DeliveryReportIndex extends Component
         // Get rows using your existing computed method
         $rows = $this->deliveryRows();
 
-        if(count($rows) === 0) {
+        if (count($rows) === 0) {
             $this->dispatch('toast', message: 'Items is empty!', type: 'warning');
         }
 
         // Prepare filename
-        $filename = 'delivery-report-' . $date . '.pdf';
+        $filename = 'delivery-report-'.$date.'.pdf';
 
         // Load blade view and generate PDF
         $pdf = PDF::loadView('pdf.delivery-report', [
@@ -184,48 +181,6 @@ class DeliveryReportIndex extends Component
         ]);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 7. Helper Methods
-    |--------------------------------------------------------------------------
-    */
-
-    // This method reset bulk selected property
-    protected function resetSelection()
-    {
-        $this->reset(['selected', 'selectAll']);
-    }
-
-    protected function refreshTable()
-    {
-        // unset($this->rows, $this->rowsQuery);
-    }
-
-    protected function sanitize()
-    {
-        foreach ([
-            'name',
-            'slug',
-            'description',
-            'diet_plan_type',
-            'color',
-        ] as $field) {
-            $this->$field = str($this->$field)->squish()->toString();
-        }
-    }
-
-    // This function reset all fields value
-    public function resetFields()
-    {
-        $this->reset(['search', 'isEdit', 'editRow']);
-
-        // for reset all validation error
-        $this->resetValidation();
-
-        $this->resetPage();
-    }
-
     public function render()
     {
         $this->authorize('diet-plan.view');
@@ -233,6 +188,3 @@ class DeliveryReportIndex extends Component
         return view('livewire.admin.delivery-report-management.delivery-report-index');
     }
 }
-
-
-

@@ -29,13 +29,6 @@
         {{-- table --}}
         @include('admin.delivery-report-management.inc.table')
 
-        {{-- pagination --}}
-        <div class="flex justify-end">
-            {{-- {{ $this->rows->links('livewire::pagination') }} --}}
-        </div>
-
     </div>
-
-    <x-modal.delete-confirmation />
 
 </div>

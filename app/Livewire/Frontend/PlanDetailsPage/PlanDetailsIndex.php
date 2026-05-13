@@ -91,6 +91,8 @@ class PlanDetailsIndex extends Component
 
         $this->originalPrice = (float) $price;
         $this->finalPrice = $this->originalPrice;
+
+        $this->loadAdditionalMealTypes();
     }
 
     public function setTimezone($tz)
@@ -230,16 +232,8 @@ class PlanDetailsIndex extends Component
     use Submit;
     use Summery;
 
-    // public function summeryCalculations()
-    // {
-    //     dd($this->starting_date);
-    //     dd($this->days_of_week_selected);
-    // }
-
     public function render()
     {
-
-        $this->loadAdditionalMealTypes();
 
         return view('livewire.frontend.plan-details-page.plan-details-index', [
             'dietPlans' => $this->dietPlans,

@@ -57,10 +57,11 @@ class PackingReportIndex extends Component
     #[Computed()]
     public function packingRows(): Collection
     {
-        $date = $this->filterDate ?? $this->search ?? now()->toDateString();
+        // Optional: filter date from component property $this->filterDate (Y-m-d) or use today
+        $date = $this->filterDate ?? now()->toDateString();
 
-        $mainSelections = SubscriberMealSelection::with(['subscriber.user', 'meal'])
-            ->when($date, fn ($q) => $q->whereDate('date', $date))
+        $selections = SubscriberMealSelection::with(['subscriber.user', 'meal'])
+            ->whereDate('date', $date)
             ->when($this->search, function ($q) {
                 $q->whereHas('subscriber.user', function ($sq) {
                     $sq->where('name', 'like', "%{$this->search}%");
@@ -68,35 +69,15 @@ class PackingReportIndex extends Component
             })
             ->get();
 
-        $additionalSelections = \App\Models\SubscriberAdditionalMealSelection::with(['subscriber.user', 'meal'])
-            ->when($date, fn ($q) => $q->whereDate('date', $date))
-            ->when($this->search, function ($q) {
-                $q->whereHas('subscriber.user', function ($sq) {
-                    $sq->where('name', 'like', "%{$this->search}%");
-                })->orWhere('date', 'like', "%{$this->search}%");
-            })
-            ->get();
-
-        $all = $mainSelections->concat($additionalSelections);
-
-        $grouped = $all->groupBy(function ($item) {
+        // Group by subscriber_id + date in PHP
+        $grouped = $selections->groupBy(function ($item) {
             return $item->subscriber_id.'|'.$item->date;
         });
 
+        // Map to objects for Blade friendliness
         $rows = $grouped->map(function ($group) {
             $first = $group->first();
             $user = $first->subscriber->user ?? null;
-
-            // === এখানে পরিবর্তন: countBy() ব্যবহার করে সঠিক গণনা ===
-            $mealCounts = $group->pluck('meal.name')
-                ->filter()            // remove nulls
-                ->countBy()           // returns Collection like ['Chicken' => 2, 'Rice' => 1]
-                ->toArray();
-
-            // স্ট্রিং অ্যারে বানানো যাতে PDF-এ implode কাজ করে
-            $mealNamesWithCount = collect($mealCounts)->map(function ($count, $name) {
-                return "{$name} ({$count})";
-            })->values()->all();
 
             return (object) [
                 'id' => $first->id,
@@ -106,8 +87,8 @@ class PackingReportIndex extends Component
                 'subscriber_phone' => $user->phone ?? ($first->subscriber->phone ?? '—'),
                 'subscriber_address' => collect([$first->subscriber->house, $first->subscriber->road, $first->subscriber->area, $first->subscriber->additional_direction])
                     ->filter()->implode(', '),
-                'meal_names' => $mealNamesWithCount, // এখন array of strings: ["Chicken (2)", "Rice (1)"]
-                'subscriber_allergens' => $first->subscriber->allergens ?? [],
+                'meal_names' => $group->pluck('meal.name')->filter()->values()->all(), // array of names
+                'subscriber_allergens' => $first->subscriber->allergens, // array of names
             ];
         })->values();
 

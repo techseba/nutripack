@@ -11,8 +11,6 @@
             {{-- export button --}}
             <x-ui.button wire:click="exportPackingPdf">Download PDF</x-ui.button>
 
-            {{-- <x-modal.upload-csv-form /> --}}
-
         </div>
 
     </div>
@@ -26,20 +24,11 @@
             {{-- header --}}
             <x-widget.table-header />
 
-            {{-- modal --}}
-            {{-- @include('admin.packing-report-management.inc.form') --}}
         </div>
 
         {{-- table --}}
         @include('admin.packing-report-management.inc.table')
 
-        {{-- pagination --}}
-        <div class="flex justify-end">
-            {{-- {{ $this->packingRows()->links('livewire::pagination') }} --}}
-        </div>
-
     </div>
-
-    <x-modal.delete-confirmation />
 
 </div>

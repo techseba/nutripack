@@ -18,8 +18,10 @@
                     <x-table.td>{{ $row->subscriber_name }}</x-table.td>
                     <x-table.td>{{ $row->subscriber_phone }}</x-table.td>
                     <x-table.td>
-                        @foreach ($row->meal_names as $mealName)
-                            <div class="text-sm">{{ $mealName }}</div>
+                        @foreach ($row->meal_names as $meal)
+                            <div class="text-sm">
+                                {{ $meal }}
+                            </div>
                         @endforeach
                     </x-table.td>
                     <x-table.td>
