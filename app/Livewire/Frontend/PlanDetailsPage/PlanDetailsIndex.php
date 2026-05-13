@@ -10,6 +10,7 @@ use App\Models\DietPlan;
 use App\Models\Ingredient;
 use App\Models\Plan;
 use App\Models\PlanCategory;
+use App\Models\Subscriber;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -74,6 +75,15 @@ class PlanDetailsIndex extends Component
 
     public function mount($price = 0)
     {
+        $existingSubscriber = Subscriber::where('user_id', auth()->user()->id)->first();
+
+        $this->phone = $existingSubscriber->phone ?? null;
+        $this->house = $existingSubscriber->house ?? null;
+        $this->road = $existingSubscriber->road ?? null;
+        $this->block = $existingSubscriber->block ?? null;
+        $this->area = $existingSubscriber->area ?? null;
+        $this->additional_direction = $existingSubscriber->additional_direction ?? null;
+
         $this->timezone = auth()->user()->timezone ?? 'UTC';
         $this->dietPlans = DietPlan::orderBy('name')->get(['id', 'name']);
 

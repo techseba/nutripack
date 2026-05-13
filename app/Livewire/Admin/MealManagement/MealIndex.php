@@ -76,8 +76,8 @@ class MealIndex extends Component
     public $protein;
     public $carbs;
     public $fat;
-    public $fiber;
-    public $price;
+    public $fiber = 0;
+    public $price = 0;
     public $status;
     public $user_id;
     public $meal_type_id;

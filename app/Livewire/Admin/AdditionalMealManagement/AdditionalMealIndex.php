@@ -59,7 +59,7 @@ class AdditionalMealIndex extends Component
 
     public string $unit_price;
 
-    public int $max_quantity = 2;
+    public int $max_quantity = 1;
 
     public $status;
 

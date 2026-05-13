@@ -62,7 +62,7 @@ class PlanCategoryIndex extends Component
     public $protein;
     public $carbs;
     public $fat;
-    public $fiber;
+    public $fiber = 0;
 
     public $image; // new upload
     public $existingImage; // old image path

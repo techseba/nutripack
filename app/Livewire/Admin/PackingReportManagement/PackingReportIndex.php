@@ -149,7 +149,7 @@ class PackingReportIndex extends Component
     public function exportPackingPdf(): StreamedResponse
     {
         // Ensure date filter is set; fallback to today
-        $date = $this->search ?? now()->setTimezone('Asia/Dhaka')->toDateTimeString();
+        $date = $this->search ?? now()->setTimezone(config('app.timezone'))->toDateTimeString();
 
         // Get rows using your existing computed method
         $rows = $this->packingRows();
@@ -157,7 +157,7 @@ class PackingReportIndex extends Component
         if(count($rows) === 0) {
             $this->dispatch('toast', message: 'Items is empty!', type: 'warning');
         }
-        
+
         // Prepare filename
         $filename = 'packing-report-' . $date . '.pdf';
 

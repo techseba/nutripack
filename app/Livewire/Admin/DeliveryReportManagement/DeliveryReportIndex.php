@@ -152,7 +152,7 @@ class DeliveryReportIndex extends Component
     public function exportDeliveryPdf(): StreamedResponse
     {
         // Ensure date filter is set; fallback to today
-        $date = $this->search ?? now()->setTimezone('Asia/Dhaka')->toDateTimeString();
+        $date = $this->search ?? now()->setTimezone(config('app.timezone'))->toDateTimeString();
 
         // Get rows using your existing computed method
         $rows = $this->deliveryRows();

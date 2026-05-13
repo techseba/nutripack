@@ -23,8 +23,8 @@
 <body>
     <div class="header">
         <h2>{{ $pageName }}</h2>
-        <div class="meta">Date: <strong>{{ \Carbon\Carbon::parse($date)->setTimezone('Asia/Dhaka')->format('d M Y') }}</strong></div>
-        <div class="meta small">Generated at: {{ $generated_at->setTimezone('Asia/Dhaka')->format('d M Y, h:i A') }}</div>
+        <div class="meta">Date: <strong>{{ \Carbon\Carbon::parse($date)->setTimezone(config('app.timezone'))->format('d M Y') }}</strong></div>
+        <div class="meta small">Generated at: {{ $generated_at->setTimezone(config('app.timezone'))->format('d M Y, h:i A') }}</div>
     </div>
 
     <table>
@@ -41,10 +41,10 @@
             @foreach($rows as $i => $row)
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td>{{ \Carbon\Carbon::parse($row->date)->setTimezone('Asia/Dhaka')->format('d M Y') }}</td>
-                    <td>{{ $row->meal->name }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->date)->setTimezone(config('app.timezone'))->format('d M Y') }}</td>
+                    <td>{{ $row->meal_name }}</td>
                     <td>{{ $row->qty }}</td>
-                    <td>{{ $row->meal->mealType->name }}</td>
+                    <td>{{ $row->meal_type_name }}</td>
                 </tr>
             @endforeach
         </tbody>

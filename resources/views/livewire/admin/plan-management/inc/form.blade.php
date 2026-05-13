@@ -32,7 +32,7 @@
                 <x-form.field-input type="number" disabled model="protein" label="protein" />
                 <x-form.field-input type="number" disabled model="carbs" label="carbs" />
                 <x-form.field-input type="number" disabled model="fat" label="fat" />
-                <x-form.field-input type="number" disabled model="fiber" label="fiber" />
+                {{-- <x-form.field-input type="number" disabled model="fiber" label="fiber" /> --}}
             </div>
         </div>
 

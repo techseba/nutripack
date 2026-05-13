@@ -8,34 +8,38 @@ use App\Models\MealType;
 trait AdditionalMeals
 {
     public $hasBreakfast;
-
     public $breakfastMaxQuantity;
-
     public $breakfastUnitPrice;
-
     public $breakfastQuantity = 0;
-
     public $breakfastTotalPrice;
 
+
     public $hasLunch;
-
     public $lunchMaxQuantity;
-
     public $lunchUnitPrice;
-
     public $lunchQuantity = 0;
-
     public $lunchTotalPrice;
 
+
+    public $hasDinner;
+    public $dinnerMaxQuantity;
+    public $dinnerUnitPrice;
+    public $dinnerQuantity = 0;
+    public $dinnerTotalPrice;
+
+
     public $hasSalad;
-
     public $saladMaxQuantity;
-
     public $saladUnitPrice;
-
     public $saladQuantity = 0;
-
     public $saladTotalPrice;
+
+
+    public $hasSnacks;
+    public $snacksMaxQuantity;
+    public $snacksUnitPrice;
+    public $snacksQuantity = 0;
+    public $snacksTotalPrice;
 
     public $mealTypes = [];
 
@@ -61,10 +65,20 @@ trait AdditionalMeals
         $this->lunchUnitPrice = 0;
         $this->lunchTotalPrice = 0;
 
+        $this->hasDinner = false;
+        $this->dinnerMaxQuantity = 0;
+        $this->dinnerUnitPrice = 0;
+        $this->dinnerTotalPrice = 0;
+
         $this->hasSalad = false;
         $this->saladMaxQuantity = 0;
         $this->saladUnitPrice = 0;
         $this->saladTotalPrice = 0;
+
+        $this->hasSnacks = false;
+        $this->snacksMaxQuantity = 0;
+        $this->snacksUnitPrice = 0;
+        $this->snacksTotalPrice = 0;
 
         $this->totalAdditionalPrice = 0;
 
@@ -82,9 +96,21 @@ trait AdditionalMeals
             );
         }
 
+        if ($this->dinnerQuantity > 0) {
+            $this->mealTypes = $this->mealTypes->merge(
+                MealType::where('name', 'Dinner')->pluck('id')
+            );
+        }
+
         if ($this->saladQuantity > 0) {
             $this->mealTypes = $this->mealTypes->merge(
                 MealType::where('name', 'Salad')->pluck('id')
+            );
+        }
+
+        if ($this->snacksQuantity > 0) {
+            $this->mealTypes = $this->mealTypes->merge(
+                MealType::where('name', 'Snacks')->pluck('id')
             );
         }
 
@@ -104,8 +130,15 @@ trait AdditionalMeals
             $this->hasLunch = true;
             $this->lunchMaxQuantity = (int) ($additionalMealTypes['Lunch']['max_quantity'] ?? 0);
             $this->lunchUnitPrice = (float) ($additionalMealTypes['Lunch']['unit_price'] ?? 0);
-            // breakfastQuantity আগেই mount() এ ইনিশিয়ালাইজ করা আছে ধরে নিচ্ছি
             $this->lunchTotalPrice = $this->lunchUnitPrice * (int) $this->lunchQuantity;
+        }
+
+        // Dinner সেট করা (DB থেকে)
+        if (isset($additionalMealTypes['Dinner'])) {
+            $this->hasDinner = true;
+            $this->dinnerMaxQuantity = (int) ($additionalMealTypes['Dinner']['max_quantity'] ?? 0);
+            $this->dinnerUnitPrice = (float) ($additionalMealTypes['Dinner']['unit_price'] ?? 0);
+            $this->dinnerTotalPrice = $this->dinnerUnitPrice * (int) $this->dinnerQuantity;
         }
 
         // Salad সেট করা (DB থেকে)
@@ -116,7 +149,15 @@ trait AdditionalMeals
             $this->saladTotalPrice = $this->saladUnitPrice * (int) $this->saladQuantity;
         }
 
+        // Snacks সেট করা (DB থেকে)
+        if (isset($additionalMealTypes['Snacks'])) {
+            $this->hasSnacks = true;
+            $this->snacksMaxQuantity = (int) ($additionalMealTypes['Snacks']['max_quantity'] ?? 0);
+            $this->snacksUnitPrice = (float) ($additionalMealTypes['Snacks']['unit_price'] ?? 0);
+            $this->snacksTotalPrice = $this->snacksUnitPrice * (int) $this->snacksQuantity;
+        }
+
         // মোট আপডেট
-        $this->totalAdditionalPrice = $this->breakfastTotalPrice + $this->lunchTotalPrice + $this->saladTotalPrice;
+        $this->totalAdditionalPrice = $this->breakfastTotalPrice + $this->lunchTotalPrice + $this->dinnerTotalPrice + $this->saladTotalPrice + $this->snacksTotalPrice;
     }
 }

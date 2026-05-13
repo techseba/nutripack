@@ -22,8 +22,6 @@ trait Submit
 {
     public function submit()
     {
-        // dd($this->mealTypes);
-        // assign userId
         $userId = auth()->id();
 
         // auth check
@@ -134,7 +132,9 @@ trait Submit
             // Additional meals rules
             'breakfastQuantity' => ['nullable', 'numeric'],
             'lunchQuantity' => ['nullable', 'numeric'],
+            'dinnerQuantity' => ['nullable', 'numeric'],
             'saladQuantity' => ['nullable', 'numeric'],
+            'snacksQuantity' => ['nullable', 'numeric'],
 
             'allergens' => ['nullable', 'array'],
             'allergens.*' => ['exists:ingredients,name'],
@@ -247,6 +247,13 @@ trait Submit
             $additionalMealLunchPrice = 0;
         }
 
+        if ($this->dinnerQuantity > 0) {
+            $additionalMealDinner = AdditionalMeal::where('name', 'Dinner')->first();
+            $additionalMealDinnerPrice = $additionalMealDinner->unit_price * $this->planDays;
+        } else {
+            $additionalMealDinnerPrice = 0;
+        }
+
         if ($this->saladQuantity > 0) {
             $additionalMealSalad = AdditionalMeal::where('name', 'Salad')->first();
             $additionalMealSaladPrice = $additionalMealSalad->unit_price * $this->planDays;
@@ -254,7 +261,14 @@ trait Submit
             $additionalMealSaladPrice = 0;
         }
 
-        $totalAdditionalMealPrice = $additionalMealBreakfastPrice + $additionalMealLunchPrice + $additionalMealSaladPrice;
+        if ($this->snacksQuantity > 0) {
+            $additionalMealSnacks = AdditionalMeal::where('name', 'Snacks')->first();
+            $additionalMealSnacksPrice = $additionalMealSnacks->unit_price * $this->planDays;
+        } else {
+            $additionalMealSnacksPrice = 0;
+        }
+
+        $totalAdditionalMealPrice = $additionalMealBreakfastPrice + $additionalMealLunchPrice + $additionalMealDinnerPrice + $additionalMealSaladPrice + $additionalMealSnacksPrice;
 
 
         // 4. Promo handling and safe save inside transaction

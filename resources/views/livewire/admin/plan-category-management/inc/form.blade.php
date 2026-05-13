@@ -23,10 +23,10 @@
             <div class="flex flex-col lg:flex-row gap-4">
                 <x-form.field-input type="number" model="min_calories" label="minimum calories" />
                 <x-form.field-input type="number" model="max_calories" label="maximum calories" />
-                <x-form.field-input type="number" model="protein" label="protein" />
-                <x-form.field-input type="number" model="carbs" label="carbs" />
-                <x-form.field-input type="number" model="fat" label="fat" />
-                <x-form.field-input type="number" model="fiber" label="fiber" />
+                <x-form.field-input type="number" model="protein" label="protein" required />
+                <x-form.field-input type="number" model="carbs" label="carbs" required />
+                <x-form.field-input type="number" model="fat" label="fat" required />
+                {{-- <x-form.field-input type="number" model="fiber" label="fiber" /> --}}
             </div>
         </div>
         <div class="space-y-5">

@@ -24,8 +24,8 @@
 <body>
     <div class="header">
         <h2>{{ $pageName }}</h2>
-        <div class="meta">Date: <strong>{{ \Carbon\Carbon::parse($date)->setTimezone('Asia/Dhaka')->format('d M Y') }}</strong></div>
-        <div class="meta small">Generated at: {{ $generated_at->setTimezone('Asia/Dhaka')->format('d M Y, h:i A') }}</div>
+        <div class="meta">Date: <strong>{{ \Carbon\Carbon::parse($date)->setTimezone(config('app.timezone'))->format('d M Y') }}</strong></div>
+        <div class="meta small">Generated at: {{ $generated_at->setTimezone(config('app.timezone'))->format('d M Y, h:i A') }}</div>
     </div>
 
     <table>
@@ -42,7 +42,7 @@
         <tbody>
             @foreach($rows as $row)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($row->date)->setTimezone('Asia/Dhaka')->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->date)->setTimezone(config('app.timezone'))->format('d M Y') }}</td>
                     <td>{{ $row->subscriber_id }}</td>
                     <td>{{ $row->subscriber_name }}</td>
                     <td>{{ $row->subscriber_phone }}</td>

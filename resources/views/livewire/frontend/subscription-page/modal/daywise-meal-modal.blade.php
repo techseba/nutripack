@@ -208,7 +208,6 @@
 
                 $mealsByType = $meals->groupBy('meal_type_id');
 
-
                 $subscriber = App\Models\Subscriber::with(['plan.planCategory.mealTypes', 'deliveryDays'])
                     ->where('user_id', $this->userId)
                     ->where('status', 'active')
@@ -255,8 +254,23 @@
                 @if (empty($groupedMeals))
                     <div class="w-full max-w-md mt-5 mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-6 flex flex-col items-center text-center"
                         role="status" aria-live="polite">
+
+                        <!-- Icon -->
+                        <div
+                            class="flex items-center justify-center w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 mb-4 shadow-inner animate-[pulse_2.5s_ease-in-out_infinite]">
+                            <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M12 16h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"
+                                    stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+
                         <!-- Title -->
-                        <h2 class="text-xl text-slate-500 mb-1">No additional meals found</h2>
+                        <h2 class="text-md text-slate-700 mb-1">No additional meals found</h2>
                     </div>
                 @else
                     @foreach ($groupedMeals as $mealTypeName => $meals)
