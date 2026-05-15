@@ -2,18 +2,17 @@
 
 namespace App\Livewire\Frontend\PlanDetailsPage\Traits;
 
+use App\Mail\NewSubscriptionInvoiceMail;
 use App\Mail\NewSubscriptionMail;
 use App\Mail\UserSubscribedMail;
 use App\Models\AdditionalMeal;
 use App\Models\Plan;
 use App\Models\PromoCode;
 use App\Models\Subscriber;
-use App\Notifications\NewSubscriptionNotification;
 use App\Services\SubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
@@ -270,7 +269,6 @@ trait Submit
 
         $totalAdditionalMealPrice = $additionalMealBreakfastPrice + $additionalMealLunchPrice + $additionalMealDinnerPrice + $additionalMealSaladPrice + $additionalMealSnacksPrice;
 
-
         // 4. Promo handling and safe save inside transaction
         $promoCodeString = $this->promo_code ?: null;
         $subtotal = (float) $plan->price + $totalAdditionalMealPrice;
@@ -375,10 +373,8 @@ trait Submit
 
                 $subscriber->mealTypes()->sync($this->mealTypes);
 
-                Notification::route('mail', env('ADMIN_EMAIL'))
-                    ->notify(new NewSubscriptionNotification($subscriber, $subscriber->created_at));
-
-                // Mail::to(env('ADMIN_EMAIL'))->send(new NewSubscriptionMail($subscriber));
+                Mail::to(env('ADMIN_EMAIL'))->send(new NewSubscriptionMail($subscriber));
+                Mail::to($subscriber->user->email)->send(new NewSubscriptionInvoiceMail($subscriber));
 
             });
         } catch (\Exception $e) {

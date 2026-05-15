@@ -13,12 +13,16 @@ class SubscriberPaymentSuccessMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $subscriber;
+    public $firstDeliveryDate;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($subscriber, $firstDeliveryDate)
     {
-        //
+        $this->subscriber = $subscriber;
+        $this->firstDeliveryDate = $firstDeliveryDate;
     }
 
     /**
@@ -27,7 +31,7 @@ class SubscriberPaymentSuccessMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Subscriber Payment Success Mail',
+            subject: 'Payment Confirmed — Healthy Meal',
         );
     }
 
@@ -37,7 +41,7 @@ class SubscriberPaymentSuccessMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'mail.subscriber_payment_success',
         );
     }
 

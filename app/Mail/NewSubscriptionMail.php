@@ -3,7 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+// use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,8 +14,6 @@ class NewSubscriptionMail extends Mailable
     use Queueable, SerializesModels;
 
     public $subscriber;
-    public $subscribedAt;
-    public $paymentStatus;
 
     /**
      * Create a new message instance.
@@ -23,8 +21,6 @@ class NewSubscriptionMail extends Mailable
     public function __construct($subscriber)
     {
         $this->subscriber = $subscriber;
-        $this->subscribedAt = $subscribedAt ?? '-';
-        $this->paymentStatus = $paymentStatus ?? '-';
     }
 
     /**
@@ -33,7 +29,7 @@ class NewSubscriptionMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Subscription Mail',
+            subject: 'New Subscriber Alert',
         );
     }
 

@@ -3,7 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+// use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,12 +13,14 @@ class NewSubscriptionInvoiceMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $subscriber;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($subscriber)
     {
-        //
+        $this->subscriber = $subscriber;
     }
 
     /**
@@ -27,7 +29,7 @@ class NewSubscriptionInvoiceMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Subscription Invoice Mail',
+            subject: 'Invoice — Healthy Meal',
         );
     }
 
@@ -37,7 +39,7 @@ class NewSubscriptionInvoiceMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'mail.new_subscription_invoice',
         );
     }
 

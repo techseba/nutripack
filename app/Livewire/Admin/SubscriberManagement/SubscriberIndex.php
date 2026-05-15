@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Admin\SubscriberManagement;
 
+use App\Mail\SubscriberPaymentSuccessMail;
 use App\Models\Subscriber;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -14,11 +16,12 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
-use Spatie\Permission\Models\Permission;
 
 #[Title('Subscriber Management')]
 class SubscriberIndex extends Component
 {
+    use AuthorizesRequests;
+    use WithFileUploads;
     /*
     |--------------------------------------------------------------------------
     | 1. Traits
@@ -26,9 +29,7 @@ class SubscriberIndex extends Component
     */
 
     // ===== For Livewire Pagination =====
-    use WithPagination, WithoutUrlPagination;
-    use AuthorizesRequests;
-    use WithFileUploads;
+    use WithoutUrlPagination, WithPagination;
 
     /*
     |--------------------------------------------------------------------------
@@ -44,30 +45,47 @@ class SubscriberIndex extends Component
 
     // ===== Table State =====
     public array $selected = [];
+
     public bool $selectAll = false;
+
     public int $perPage = 5;
 
     // ===== Form State =====
     public $updaterEmail;
+
     public $updaterPhone;
+
     public $name;
+
     public $phone;
+
     public $email;
+
     public $address;
+
     public $days_of_week;
+
     public $plan_price;
+
     public $subtotal;
+
     public $promo_code;
+
     public $discount_amount;
+
     public $total;
+
     public $payment_status;
+
     public $starting_date;
+
     public $expires_date;
+
     public $status;
 
     public bool $isEdit = false;
-    public ?int $editRow = null;
 
+    public ?int $editRow = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -151,7 +169,7 @@ class SubscriberIndex extends Component
         $this->name = $subscriber->user->name;
         $this->phone = $subscriber->phone;
         $this->email = $subscriber->user->email;
-        $this->address = $subscriber->house . ', ' . $subscriber->road . ', ' . $subscriber->block . ', ' . $subscriber->area . ', ' . $subscriber->additional_direction;
+        $this->address = $subscriber->house.', '.$subscriber->road.', '.$subscriber->block.', '.$subscriber->area.', '.$subscriber->additional_direction;
         $this->days_of_week = $subscriber->plan->days_of_week;
         $this->plan_price = $subscriber->plan->price;
         $this->subtotal = $subscriber->subtotal;
@@ -223,9 +241,18 @@ class SubscriberIndex extends Component
 
             $subscriber->update($data);
 
-            activity()->causedBy(auth()->user())->withProperties(['describe'=>'Subscriber name - ' . $subscriber->user->name])->log('Subscribed updated with ' . $this->payment_status);
+            if ($subscriber->payment_status == 'paid') {
+                // Send email subscriber
+                $firstDate = $subscriber->deliveryDays()->min('delivery_date');
+                if ($firstDate) {
+                    $firstDeliveryDate = Carbon::parse($firstDate)->format('d M Y');
+                }
+                Mail::to($subscriber->user->email)->send(new SubscriberPaymentSuccessMail($subscriber, $firstDeliveryDate));
+            }
 
-            $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
+            activity()->causedBy(auth()->user())->withProperties(['describe' => 'Subscriber name - '.$subscriber->user->name])->log('Subscribed updated with '.$this->payment_status);
+
+            $this->dispatch('toast', message: ucfirst($this->subject).' updated successfully', type: 'success');
 
         }
 
@@ -243,7 +270,7 @@ class SubscriberIndex extends Component
     public function importCSV()
     {
         $this->validate([
-            'csv' => ['required', 'file', 'mimes:csv,txt', 'max:2048']
+            'csv' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
         ]);
 
         $path = $this->csv->getRealPath();
@@ -258,14 +285,14 @@ class SubscriberIndex extends Component
             $data = array_combine($header, $row);
 
             // database insert
-            if (!Subscriber::where('promo_code', $data['promo_code'])->exists()) {
+            if (! Subscriber::where('promo_code', $data['promo_code'])->exists()) {
                 Subscriber::firstOrCreate([
                     'name' => $data['name'],
                 ]);
             }
         }
 
-        $this->dispatch('toast', message: ucfirst($this->subject) . ' CSV imported successfully', type: 'success');
+        $this->dispatch('toast', message: ucfirst($this->subject).' CSV imported successfully', type: 'success');
 
         // Resetting form fields
         $this->resetFields();
@@ -284,7 +311,7 @@ class SubscriberIndex extends Component
 
         Subscriber::whereKey($id)->delete();
 
-        $this->dispatch('toast', message: ucfirst($this->subject) . ' deleted successfully', type: 'success');
+        $this->dispatch('toast', message: ucfirst($this->subject).' deleted successfully', type: 'success');
 
         $this->refreshTable();
 
@@ -299,12 +326,13 @@ class SubscriberIndex extends Component
 
         if (empty($this->selected)) {
             $this->dispatch('toast', message: 'No roles selected!', type: 'warning');
+
             return;
         }
 
         Subscriber::whereIn('id', $this->selected)->delete();
 
-        $this->dispatch('toast', message: count($this->selected) . ' ' . ucfirst($this->subject) . ' deleted successfully!', type: 'success');
+        $this->dispatch('toast', message: count($this->selected).' '.ucfirst($this->subject).' deleted successfully!', type: 'success');
 
         // Reset selection
         $this->resetSelection();
@@ -354,7 +382,7 @@ class SubscriberIndex extends Component
             'status',
 
             'isEdit',
-            'editRow'
+            'editRow',
         ]);
 
         // for reset all validation error
@@ -367,10 +395,9 @@ class SubscriberIndex extends Component
     {
         $date = now()->addDay()->toDateString(); // notify for tomorrow
         dd($date);
-        $subs = Subscriber::active()->where('expires_date','>=',$date)
-            ->whereDoesntHave('selections', fn($q)=> $q->whereDate('date',$date))
+        $subs = Subscriber::active()->where('expires_date', '>=', $date)
+            ->whereDoesntHave('selections', fn ($q) => $q->whereDate('date', $date))
             ->with('user')->get();
-
 
     }
 
@@ -381,4 +408,3 @@ class SubscriberIndex extends Component
         return view('livewire.admin.subscriber-management.subscriber-index');
     }
 }
-
