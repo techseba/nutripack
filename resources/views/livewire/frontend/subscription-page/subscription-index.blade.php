@@ -49,12 +49,35 @@
 
             <div class="flex items-start justify-between gap-4">
                 <div>
+                    @php
+                        // DB থেকে সরাসরি min/max নেয়া (efficient)
+                        $firstDate = $subscriber->deliveryDays()->min('delivery_date');
+                        $lastDate = $subscriber->deliveryDays()->max('delivery_date');
+
+                        // ডিফল্ট টেক্সট যাতে undefined variable না হয়
+                        $startingDate = 'Not scheduled';
+                        $expiresDate = 'Not scheduled';
+
+                        if ($firstDate) {
+                            // যদি delivery_date string হয়, parse করুন; যদি model casts থাকে, Carbon.parse optional
+                            $startingDate = \Carbon\Carbon::parse($firstDate)
+                                ->setTimezone(config('app.timezone')) // প্রয়োজনমত পরিবর্তন করুন
+                                ->format('d M, Y');
+                        }
+
+                        if ($lastDate) {
+                            $expiresDate = \Carbon\Carbon::parse($lastDate)
+                                ->setTimezone(config('app.timezone'))
+                                ->format('d M, Y');
+                        }
+                    @endphp
+
                     <p class="text-sm text-slate-600 mt-1">
                         <span class="font-medium">Starts:</span>
-                        <span>{{ \Carbon\Carbon::parse($subscriber->starting_date)->format('d M, Y') }}</span>
+                        <span>{{ $startingDate }}</span>
                         <span class="mx-2 text-slate-300">•</span>
                         <span class="font-medium">Expires:</span>
-                        <span>{{ \Carbon\Carbon::parse($subscriber->expires_date)->format('d M, Y') }}</span>
+                        <span>{{ $expiresDate }}</span>
                     </p>
 
                     <p class="mt-3 inline-flex items-center gap-2 text-sm">
@@ -159,12 +182,12 @@
                         </div>
 
                         @if ($isFuture)
-                        <div class="mt-3 text-right">
-                            <button wire:click="showMeals('{{ $deliveryDay->delivery_date }}')"
-                                class="text-xs text-slate-600 border py-1 px-2 rounded cursor-pointer border-emerald-400 font-medium bg-emerald-200 group-hover:border-orange-300 group-hover:bg-orange-400 group-hover:text-white">
-                                Open
-                            </button>
-                        </div>
+                            <div class="mt-3 text-right">
+                                <button wire:click="showMeals('{{ $deliveryDay->delivery_date }}')"
+                                    class="text-xs text-slate-600 border py-1 px-2 rounded cursor-pointer border-emerald-400 font-medium bg-emerald-200 group-hover:border-orange-300 group-hover:bg-orange-400 group-hover:text-white">
+                                    Open
+                                </button>
+                            </div>
                         @endif
                     </div>
                 @endforeach
