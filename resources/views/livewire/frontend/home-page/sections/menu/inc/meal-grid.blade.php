@@ -16,7 +16,7 @@
                             <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
                                 class="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy">
                         @else
-                            <img src="{{ asset('assets/logo.jpg') }}" alt="{{ $menu->name }}"
+                            <img src="{{ asset('assets/healthymeal.webp') }}" alt="{{ $menu->name }}"
                                 class="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy">
                         @endif
 
