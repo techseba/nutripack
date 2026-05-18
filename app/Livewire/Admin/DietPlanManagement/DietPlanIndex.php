@@ -278,6 +278,9 @@ class DietPlanIndex extends Component
             if (!DietPlan::where('name', $data['name'])->exists()) {
                 DietPlan::firstOrCreate([
                     'name' => $data['name'],
+                    'slug' => $data['name'],
+                    'diet_plan_type' => $data['name'],
+                    'user_id' => 1,
                 ]);
             }
         }

@@ -275,6 +275,9 @@ class IngredientIndex extends Component
             if (!Ingredient::where('name', $data['name'])->exists()) {
                 Ingredient::firstOrCreate([
                     'name' => $data['name'],
+                    'slug' => Str::slug($data['name']),
+                    'description' => 'Healthy meal healthy calories',
+                    'user_id' => auth()->user()->id,
                 ]);
             }
         }
