@@ -3475,23 +3475,9 @@ namespace App\Models {
     /**
      * App\Models\SubscriberAdditionalMealSelection
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $meal_id
-     * @property int $meal_type_id
-     * @property \Illuminate\Support\Carbon $date
-     * @property int $subscriber_id
-     * @property int $id
      * @property-read \App\Models\Subscriber $subscriber
      * @property-read \App\Models\MealType $mealType
      * @property-read \App\Models\Meal $meal
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereSubscriberId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereDate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereMealTypeId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereMealId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<SubscriberAdditionalMealSelection>|SubscriberAdditionalMealSelection query()
