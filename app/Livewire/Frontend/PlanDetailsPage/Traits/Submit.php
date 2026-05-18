@@ -2,16 +2,17 @@
 
 namespace App\Livewire\Frontend\PlanDetailsPage\Traits;
 
+use App\Mail\NewSubscriptionInvoiceMail;
+use App\Mail\NewSubscriptionMail;
 use App\Mail\UserSubscribedMail;
+use App\Models\AdditionalMeal;
 use App\Models\Plan;
 use App\Models\PromoCode;
 use App\Models\Subscriber;
-use App\Notifications\NewSubscriptionNotification;
 use App\Services\SubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
@@ -20,8 +21,6 @@ trait Submit
 {
     public function submit()
     {
-        // dd($this->mealTypes);
-        // assign userId
         $userId = auth()->id();
 
         // auth check
@@ -132,7 +131,9 @@ trait Submit
             // Additional meals rules
             'breakfastQuantity' => ['nullable', 'numeric'],
             'lunchQuantity' => ['nullable', 'numeric'],
+            'dinnerQuantity' => ['nullable', 'numeric'],
             'saladQuantity' => ['nullable', 'numeric'],
+            'snacksQuantity' => ['nullable', 'numeric'],
 
             'allergens' => ['nullable', 'array'],
             'allergens.*' => ['exists:ingredients,name'],
@@ -231,9 +232,46 @@ trait Submit
         $this->starting_date = $start->toDateString();   // 'YYYY-MM-DD'
         $this->expires_date = $expires->toDateString(); // 'YYYY-MM-DD'
 
+        if ($this->breakfastQuantity > 0) {
+            $additionalMealBreakfast = AdditionalMeal::where('name', 'Breakfast')->first();
+            $additionalMealBreakfastPrice = $additionalMealBreakfast->unit_price * $this->planDays;
+        } else {
+            $additionalMealBreakfastPrice = 0;
+        }
+
+        if ($this->lunchQuantity > 0) {
+            $additionalMealLunch = AdditionalMeal::where('name', 'Lunch')->first();
+            $additionalMealLunchPrice = $additionalMealLunch->unit_price * $this->planDays;
+        } else {
+            $additionalMealLunchPrice = 0;
+        }
+
+        if ($this->dinnerQuantity > 0) {
+            $additionalMealDinner = AdditionalMeal::where('name', 'Dinner')->first();
+            $additionalMealDinnerPrice = $additionalMealDinner->unit_price * $this->planDays;
+        } else {
+            $additionalMealDinnerPrice = 0;
+        }
+
+        if ($this->saladQuantity > 0) {
+            $additionalMealSalad = AdditionalMeal::where('name', 'Salad')->first();
+            $additionalMealSaladPrice = $additionalMealSalad->unit_price * $this->planDays;
+        } else {
+            $additionalMealSaladPrice = 0;
+        }
+
+        if ($this->snacksQuantity > 0) {
+            $additionalMealSnacks = AdditionalMeal::where('name', 'Snacks')->first();
+            $additionalMealSnacksPrice = $additionalMealSnacks->unit_price * $this->planDays;
+        } else {
+            $additionalMealSnacksPrice = 0;
+        }
+
+        $totalAdditionalMealPrice = $additionalMealBreakfastPrice + $additionalMealLunchPrice + $additionalMealDinnerPrice + $additionalMealSaladPrice + $additionalMealSnacksPrice;
+
         // 4. Promo handling and safe save inside transaction
         $promoCodeString = $this->promo_code ?: null;
-        $subtotal = (float) $plan->price;
+        $subtotal = (float) $plan->price + $totalAdditionalMealPrice;
         $discount_amount = 0.00;
         $finalTotal = $subtotal;
         $promoId = null;
@@ -335,8 +373,8 @@ trait Submit
 
                 $subscriber->mealTypes()->sync($this->mealTypes);
 
-                Notification::route('mail', env('ADMIN_EMAIL'))
-                    ->notify(new NewSubscriptionNotification($subscriber, $subscriber->created_at));
+                Mail::to(env('ADMIN_EMAIL'))->send(new NewSubscriptionMail($subscriber));
+                Mail::to($subscriber->user->email)->send(new NewSubscriptionInvoiceMail($subscriber));
 
             });
         } catch (\Exception $e) {

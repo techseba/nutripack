@@ -13,7 +13,7 @@
                 <x-form.field-input type="number" model="protein" label="protein" />
                 <x-form.field-input type="number" model="carbs" label="carbs" />
                 <x-form.field-input type="number" model="fat" label="fat" />
-                <x-form.field-input type="number" model="fiber" label="fiber" />
+                {{-- <x-form.field-input type="number" model="fiber" label="fiber" /> --}}
                 <x-form.field-input type="number" model="price" label="price" />
             </div>
         </div>

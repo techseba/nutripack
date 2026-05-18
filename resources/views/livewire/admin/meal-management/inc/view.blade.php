@@ -31,10 +31,11 @@
                 <x-table.td>{{ $this->fat }}</x-table.td>
             </x-table.tr>
 
-            <x-table.tr>
+            {{-- <x-table.tr>
                 <x-table.th thead>fiber</x-table.th>
                 <x-table.td>{{ $this->fiber }}</x-table.td>
             </x-table.tr>
+             --}}
         </table>
     </div>
 </x-modal.single-view>

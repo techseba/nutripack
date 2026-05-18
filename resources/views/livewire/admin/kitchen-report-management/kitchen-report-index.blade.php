@@ -9,12 +9,6 @@
         {{-- button group --}}
         <div class="flex gap-2">
 
-            {{-- bulk delete modal --}}
-            <x-action.bulk-delete />
-
-            {{-- select per page paginate --}}
-            <x-form.per-page-select />
-
             {{-- export button --}}
             <x-ui.button wire:click="exportKitchenPdf">Download PDF</x-ui.button>
 
@@ -31,20 +25,11 @@
             {{-- header --}}
             <x-widget.table-header />
 
-            {{-- modal --}}
-            {{-- @include('admin.kitchen-report-management.inc.form') --}}
         </div>
 
         {{-- table --}}
         @include('admin.kitchen-report-management.inc.table')
 
-        {{-- pagination --}}
-        <div class="flex justify-end">
-            {{-- {{ $this->rows->links('livewire::pagination') }} --}}
-        </div>
-
     </div>
-
-    <x-modal.delete-confirmation />
 
 </div>

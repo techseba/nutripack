@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Livewire\Admin\AdditionalMealManagement;
+namespace App\Livewire\Admin\SubscriberAdditionalMealsManagement;
 
-use App\Models\AdditionalMeal;
 use App\Models\DietPlan;
+use App\Models\Meal;
 use App\Models\MealType;
+use App\Models\SubscriberAdditionalMealSelection;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
-#[Title('Additional Meals Management')]
-class AdditionalMealIndex extends Component
+#[Title('Subscriber Additional Meals Management')]
+class SubscriberAdditionalMealsIndex extends Component
 {
-    use AuthorizesRequests;
+
     /*
     |--------------------------------------------------------------------------
     | 1. Traits
@@ -27,7 +27,8 @@ class AdditionalMealIndex extends Component
     */
 
     // ===== For Livewire Pagination =====
-    use WithoutUrlPagination, WithPagination;
+    use WithPagination, WithoutUrlPagination;
+    use AuthorizesRequests;
 
     /*
     |--------------------------------------------------------------------------
@@ -36,32 +37,26 @@ class AdditionalMealIndex extends Component
     */
 
     // ===== Page Meta =====
-    public string $subject = 'additional meal';
+    public string $subject = 'subscriber additional meal';
 
     // ===== Filters =====
     public string $search = '';
 
     // ===== Table State =====
     public array $selected = [];
-
     public bool $selectAll = false;
-
     public int $perPage = 5;
 
     // ===== Form State =====
     public bool $isEdit = false;
-
     public ?int $editRow = null;
 
-    public string $name = '';
+    public string $date = '';
+    public $subscriberId;
+    public $subscriberName;
+    public $mealTypeId;
+    public $mealId;
 
-    public string $description = '';
-
-    public string $unit_price;
-
-    public int $max_quantity = 1;
-
-    public $status;
 
     /*
     |--------------------------------------------------------------------------
@@ -110,13 +105,13 @@ class AdditionalMealIndex extends Component
     #[Computed]
     public function rowsQuery(): Builder
     {
-        return AdditionalMeal::query()
+        return SubscriberAdditionalMealSelection::query()
+            ->with(['subscriber.user', 'mealType', 'meal'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('created_at', 'like', "%{$this->search}%");
+                    $q->where('date','like',"%{$this->search}%");
                 });
-            })->latest();
+        })->latest();
     }
 
     // This function will
@@ -126,10 +121,28 @@ class AdditionalMealIndex extends Component
         return $this->rowsQuery->paginate($this->perPage);
     }
 
+    // This function will
     #[Computed]
-    public function meal_types()
+    public function mealTypes()
     {
-        return MealType::latest()->get();
+        return MealType::latest()->get(["id","name"]);
+    }
+
+    public function updatedMealTypeId($value)
+    {
+        $this->reset([
+            'mealId',
+        ]);
+    }
+
+    #[Computed]
+    public function meals()
+    {
+        if ($this->mealTypeId) {
+            return Meal::where('meal_type_id', $this->mealTypeId)->latest()->get(["id","name"]);
+        }
+
+        return collect();
     }
 
     /*
@@ -142,16 +155,14 @@ class AdditionalMealIndex extends Component
     public function edit(int $id)
     {
         // Selecting specific table row with specific ID
-        $additionalMeal = AdditionalMeal::findOrFail($id);
+        $selectedTableRow = SubscriberAdditionalMealSelection::with(['subscriber.user', 'mealType', 'meal'])->findOrFail($id);
 
         // Assigning field properties values ​​from database values
-        $this->fill($additionalMeal->only([
-            'name',
-            'description',
-            'unit_price',
-            'max_quantity',
-            'status',
-        ]));
+        $this->date = Carbon::parse($selectedTableRow->date)->format('Y-m-d');
+        $this->subscriberId = $selectedTableRow->subscriber->id;
+        $this->subscriberName = $selectedTableRow->subscriber->user->name;
+        $this->mealTypeId = $selectedTableRow->mealType->id;
+        $this->mealId = $selectedTableRow->meal->id;
 
         // Changing value to isEdit property
         $this->isEdit = true;
@@ -166,29 +177,34 @@ class AdditionalMealIndex extends Component
     // This function is storing and updating data in a specific table.
     public function save()
     {
+        // Sanitizing form data
+        $this->sanitize();
 
         if ($this->isEdit) {
 
             $this->authorize('diet-plan.edit');
 
-            $additionalMeal = AdditionalMeal::findOrFail($this->editRow);
+            $SubscriberAdditionalMealSelection = SubscriberAdditionalMealSelection::findOrFail($this->editRow);
 
-            $data = $this->validate([
-                'name' => [
-                    'required',
-                    'string',
-                    'max:40',
-                    Rule::unique('additional_meals', 'name')->whereNull('deleted_at')->ignore($additionalMeal->id),
-                ],
-                'description' => ['nullable', 'string'],
-                'unit_price' => ['required', 'decimal:0,2'],
-                'max_quantity' => ['required', 'numeric'],
-                'status' => ['required', 'in:active,inactive'],
+            $this->validate([
+                'date'              => ['required','string','max:40'],
+                'subscriberId'              => ['required','string','max:40'],
+                'mealTypeId'              => ['required','string','max:40'],
+                'mealId'              => ['required','string','max:40'],
             ]);
 
-            $additionalMeal->update($data);
+            $data = [
+                'subscriber_id' => $this->subscriberId,
+                'date'  => $this->date,
+                'meal_type_id'  => $this->mealTypeId,
+                'meal_id'  => $this->mealId,
+            ];
 
-            $this->dispatch('toast', message: ucfirst($this->subject).' updated successfully', type: 'success');
+
+
+            $SubscriberAdditionalMealSelection->update($data);
+
+            $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
 
         } else {
 
@@ -196,19 +212,35 @@ class AdditionalMealIndex extends Component
 
             // Checking form validation
             $data = $this->validate([
-                'name' => ['required', 'string', 'max:40', Rule::unique('additional_meals', 'name')],
-                'description' => ['nullable', 'string'],
-                'unit_price' => ['required', 'decimal:0,2'],
-                'max_quantity' => ['required', 'numeric'],
+                'name'              =>  ['required','string','max:40'],
+                'description'       =>  ['nullable','string'],
+                'diet_plan_type'    =>  ['required','string','max:40'],
+                'image'             =>  ['nullable','file','mimes:jpg,jpeg,png','max:256'],
+                'color'             =>  ['nullable','string','max:20'],
             ]);
+
+            $slug = Str::slug($this->name);
+            $originalSlug = $slug;
+            $count = 1;
+
+            while (DietPlan::where('slug', $slug)->exists()) {
+                $slug = $originalSlug . '-' . $count++;
+            }
+            $data['slug'] = $slug;
 
             $data['user_id'] = auth()->id();
 
+            // Store image
+            if ($this->image) {
+                $filename = Str::slug($this->name) . '-' . time() . '.' . $this->image->extension();
+                $data['image'] = $this->image->storeAs('diet-plans', $filename, 'public');
+            }
+
             // Inserting a row into the database
-            AdditionalMeal::create($data);
+            DietPlan::create($data);
 
             // Notifying that a row has been successfully inserted into the database
-            $this->dispatch('toast', message: ucfirst($this->subject).' created successfully', type: 'success');
+            $this->dispatch('toast', message: ucfirst($this->subject) . ' created successfully', type: 'success');
         }
 
         // Resetting form fields
@@ -226,12 +258,9 @@ class AdditionalMealIndex extends Component
     {
         $this->authorize('diet-plan.delete');
 
-        $row = AdditionalMeal::findOrFail($id);
+        SubscriberAdditionalMealSelection::whereKey($id)->delete();
 
-        $row->whereKey($id)->withTrashed()->forceDelete();
-        // DietPlan::whereKey($id)->delete();
-
-        $this->dispatch('toast', message: ucfirst($this->subject).' deleted successfully', type: 'success');
+        $this->dispatch('toast', message: ucfirst($this->subject) . ' deleted successfully', type: 'success');
 
         $this->refreshTable();
 
@@ -246,20 +275,12 @@ class AdditionalMealIndex extends Component
 
         if (empty($this->selected)) {
             $this->dispatch('toast', message: 'No roles selected!', type: 'warning');
-
             return;
         }
 
-        $rows = AdditionalMeal::withTrashed()->whereIn('id', $this->selected)->get();
+        SubscriberAdditionalMealSelection::whereIn('id', $this->selected)->delete();
 
-        foreach ($rows as $row) {
-            $row->forceDelete();
-        }
-
-        // DietPlan::whereIn('id', $this->selected)->withTrashed()->forceDelete();
-        // DietPlan::whereIn('id', $this->selected)->delete();
-
-        $this->dispatch('toast', message: count($this->selected).' '.ucfirst($this->subject).' deleted successfully!', type: 'success');
+        $this->dispatch('toast', message: count($this->selected) . ' ' . ucfirst($this->subject) . ' deleted successfully!', type: 'success');
 
         // Reset selection
         $this->resetSelection();
@@ -286,21 +307,30 @@ class AdditionalMealIndex extends Component
         unset($this->rows, $this->rowsQuery);
     }
 
+    protected function sanitize()
+    {
+        foreach ([
+            'date',
+            'subscriberId',
+            'mealTypeId',
+            'mealId',
+        ] as $field) {
+            $this->$field = str($this->$field)->squish()->toString();
+        }
+    }
+
     // This function reset all fields value
     public function resetFields()
     {
-        $this->reset(['search', 'name', 'description', 'unit_price', 'max_quantity', 'status', 'isEdit', 'editRow']);
+        $this->reset(['search','date','subscriberId','subscriberName','mealTypeId','mealId','isEdit','editRow']);
 
         // for reset all validation error
         $this->resetValidation();
 
         $this->resetPage();
     }
-
     public function render()
     {
-        $this->authorize('diet-plan.view');
-
-        return view('livewire.admin.additional-meal-management.additional-meal-index');
+        return view('livewire.admin.subscriber-additional-meals-management.subscriber-additional-meals-index');
     }
 }

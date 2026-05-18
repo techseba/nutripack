@@ -16,7 +16,7 @@
         </div>
         <div class="space-y-5">
             <x-form.field-input type="number" model="unit_price" label="unit price" required />
-            <x-form.field-input type="number" model="max_quantity" label="max quantity" required />
+            <x-form.field-input type="number" disabled max="1" model="max_quantity" label="max quantity" class="cursor-not-allowed" />
 
             @if ($isEdit)
                 <x-form.status-select label="Status" model="status" />

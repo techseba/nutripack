@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Frontend\SubscriptionPage;
 
+use App\Livewire\Frontend\SubscriptionPage\Traits\ADMealSelection;
+use App\Livewire\Frontend\SubscriptionPage\Traits\MealSelection;
 use App\Models\DayWiseMeal;
 use App\Models\Meal;
 use App\Models\Subscriber;
+use App\Models\SubscriberAdditionalMealSelection;
 use App\Models\SubscriberMealSelection;
 use Carbon\Carbon;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,15 +25,14 @@ class SubscriptionIndex extends Component
 
     public $selectedDate = '';
     public $selectedMeals;
-
+    public $selectedMealsAD;
     public $subscriberMealTypes = [];
-
-
 
 
     // Livewire component properties
     public ?string $filterDate = null;
     public ?array $lockedMealTypes = []; // [meal_type_id => true]
+    public ?array $lockedMealTypesAD = []; // [meal_type_id => true]
 
     public function mount()
     {
@@ -58,6 +58,10 @@ class SubscriptionIndex extends Component
         $this->selectedMeals = [];
         $this->lockedMealTypes = [];
 
+        // ensure arrays are initialized
+        $this->selectedMealsAD = [];
+        $this->lockedMealTypesAD = [];
+
         $this->loadSelectedMeals();
     }
 
@@ -71,6 +75,8 @@ class SubscriptionIndex extends Component
         if (!$this->subscriber) {
             $this->selectedMeals = [];
             $this->lockedMealTypes = [];
+            $this->selectedMealsAD = [];
+            $this->lockedMealTypesAD = [];
             return;
         }
 
@@ -87,6 +93,20 @@ class SubscriptionIndex extends Component
             $this->selectedMeals[$s->meal_type_id] = $s->meal_id;
             // lock every existing meal_type so it cannot be changed later
             $this->lockedMealTypes[$s->meal_type_id] = true;
+        }
+
+        // For Additional meals
+        $selectionsAD = SubscriberAdditionalMealSelection::where('subscriber_id', $this->subscriber->id)
+            ->whereDate('date', $date)
+            ->get(['meal_type_id', 'meal_id']);
+
+        $this->selectedMealsAD = [];
+        $this->lockedMealTypesAD = [];
+
+        foreach ($selectionsAD as $s) {
+            $this->selectedMealsAD[$s->meal_type_id] = $s->meal_id;
+            // lock every existing meal_type so it cannot be changed later
+            $this->lockedMealTypesAD[$s->meal_type_id] = true;
         }
     }
 
@@ -134,78 +154,11 @@ class SubscriptionIndex extends Component
         $this->dispatch('open-modal');
     }
 
-    public function selectMeal(int $mealId): void
-    {
-        if (!$this->subscriber) {
-            $this->dispatch('toast', message: 'Subscription not found', type: 'error');
-            $this->dispatch('close-select-modal');
-            return;
-        }
+    use MealSelection;
 
-        // Use canonical filterDate (Y-m-d). Fallback to today if not set.
-        $dateYmd = $this->filterDate ?? now()->toDateString();
+    // Additional meals selection
+    use ADMealSelection;
 
-        $meal = Meal::with('mealType')->find($mealId);
-        if (!$meal) {
-            $this->dispatch('toast', message: 'Selected meal not found', type: 'error');
-            $this->dispatch('close-select-modal');
-            return;
-        }
-
-        $mealTypeId = $meal->meal_type_id ?? ($meal->mealType->id ?? null);
-        if (!$mealTypeId) {
-            $this->dispatch('toast', message: 'Meal type not found for this meal', type: 'error');
-            $this->dispatch('close-select-modal');
-            return;
-        }
-
-        // If this meal type is locked, do not allow any change
-        if (!empty($this->lockedMealTypes[$mealTypeId])) {
-            $this->dispatch('toast', message: 'এই টাইপের মিলটি ইতোমধ্যে লক করা আছে এবং পরিবর্তন করা যাবে না।', type: 'warning');
-            $this->dispatch('close-select-modal');
-            return;
-        }
-
-        // Double-check DB (race-safe)
-        $existing = SubscriberMealSelection::where('subscriber_id', $this->subscriber->id)
-            ->whereDate('date', $dateYmd)
-            ->where('meal_type_id', $mealTypeId)
-            ->first();
-
-        if ($existing) {
-            // someone else already selected — lock and inform
-            $this->lockedMealTypes[$mealTypeId] = true;
-            $this->selectedMeals[$mealTypeId] = $existing->meal_id;
-            $this->dispatch('toast', message: 'এই টাইপের জন্য ইতোমধ্যে একটি সিলেকশন আছে এবং পরিবর্তন করা যাবে না।', type: 'warning');
-            $this->dispatch('close-select-modal');
-            return;
-        }
-
-        // Insert new selection and lock
-        try {
-            DB::table('subscriber_meal_selections')->insert([
-                'subscriber_id' => $this->subscriber->id,
-                'date' => $dateYmd,
-                'meal_type_id' => $mealTypeId,
-                'meal_id' => $mealId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        } catch (QueryException $e) {
-            // unique constraint or other DB errors
-            $this->lockedMealTypes[$mealTypeId] = true;
-            $this->dispatch('toast', message: 'Could not save selection. It may already exist.', type: 'warning');
-            $this->dispatch('close-select-modal');
-            return;
-        }
-
-        // update local state immediately
-        $this->selectedMeals[$mealTypeId] = $mealId;
-        $this->lockedMealTypes[$mealTypeId] = true;
-
-        $this->dispatch('toast', message: 'Meal selected and locked successfully', type: 'success');
-        $this->dispatch('close-select-modal');
-    }
 
     public $showPreview = false;
     public $selectedMeal = null;

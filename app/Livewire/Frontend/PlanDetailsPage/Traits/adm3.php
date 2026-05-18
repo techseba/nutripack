@@ -10,53 +10,33 @@ trait AdditionalMeals
 {
     // ===== state properties =====
     public $hasBreakfast;
-
     public $breakfastMaxQuantity;
-
     public $breakfastUnitPrice;
-
     public $breakfastQuantity = 0;
-
     public $breakfastTotalPrice = 0;
 
     public $hasLunch;
-
     public $lunchMaxQuantity;
-
     public $lunchUnitPrice;
-
     public $lunchQuantity = 0;
-
     public $lunchTotalPrice = 0;
 
     public $hasDinner;
-
     public $dinnerMaxQuantity;
-
     public $dinnerUnitPrice;
-
     public $dinnerQuantity = 0;
-
     public $dinnerTotalPrice = 0;
 
     public $hasSalad;
-
     public $saladMaxQuantity;
-
     public $saladUnitPrice;
-
     public $saladQuantity = 0;
-
     public $saladTotalPrice = 0;
 
     public $hasSnacks;
-
     public $snacksMaxQuantity;
-
     public $snacksUnitPrice;
-
     public $snacksQuantity = 0;
-
     public $snacksTotalPrice = 0;
 
     /** @var array|Collection ids of selected meal types */
@@ -69,32 +49,10 @@ trait AdditionalMeals
     protected array $mealTypeIds = [];
 
     /**
-     * Initial load to be called from component mount().
-     * This will populate config and sync mealTypes/totals according to existing quantities.
+     * Load additional meal types from DB and initialize properties.
+     * Call this from your component's mount(): $this->loadAdditionalMealTypes();
      */
     public function loadAdditionalMealTypes(): void
-    {
-        // refresh DB-driven config (unit prices, max quantities, flags, mealTypeIds)
-        $this->refreshAdditionalMealConfig();
-
-        // ensure mealTypes is a collection for operations (do not reset user quantities)
-        $this->mealTypes = collect($this->mealTypes ?? []);
-
-        // sync mealTypes according to current quantities (add/remove)
-        $this->syncAllMealTypes();
-
-        // update totals based on current quantities and unit prices
-        $this->updateTotals();
-
-        // store as plain array for Livewire serialization
-        $this->mealTypes = collect($this->mealTypes)->unique()->values()->all();
-    }
-
-    /**
-     * Refresh only DB-driven configuration.
-     * Safe to call repeatedly (does not reset user-entered quantities or mealTypes).
-     */
-    protected function refreshAdditionalMealConfig(): void
     {
         // load active additional meals keyed by name
         $additionalMealTypes = AdditionalMeal::where('status', 'active')
@@ -104,60 +62,80 @@ trait AdditionalMeals
             ->toArray();
 
         // cache meal type ids for quick lookup (single DB call)
-        $this->mealTypeIds = MealType::whereIn('name', ['Breakfast', 'Lunch', 'Dinner', 'Salad', 'Snacks'])
+        $this->mealTypeIds = MealType::whereIn('name', ['Breakfast','Lunch','Dinner','Salad','Snacks'])
             ->pluck('id', 'name')
             ->toArray();
 
-        // update flags and unit prices / max quantities — DO NOT reset quantities or mealTypes
+        // reset flags and totals (keep quantities as they may be prefilled)
+        $this->hasBreakfast = false;
+        $this->breakfastMaxQuantity = 0;
+        $this->breakfastUnitPrice = 0;
+        $this->breakfastTotalPrice = 0;
+
+        $this->hasLunch = false;
+        $this->lunchMaxQuantity = 0;
+        $this->lunchUnitPrice = 0;
+        $this->lunchTotalPrice = 0;
+
+        $this->hasDinner = false;
+        $this->dinnerMaxQuantity = 0;
+        $this->dinnerUnitPrice = 0;
+        $this->dinnerTotalPrice = 0;
+
+        $this->hasSalad = false;
+        $this->saladMaxQuantity = 0;
+        $this->saladUnitPrice = 0;
+        $this->saladTotalPrice = 0;
+
+        $this->hasSnacks = false;
+        $this->snacksMaxQuantity = 0;
+        $this->snacksUnitPrice = 0;
+        $this->snacksTotalPrice = 0;
+
+        $this->totalAdditionalPrice = 0;
+
+        // set flags & unit prices from DB if available
         if (isset($additionalMealTypes['Breakfast'])) {
             $this->hasBreakfast = true;
             $this->breakfastMaxQuantity = (int) ($additionalMealTypes['Breakfast']['max_quantity'] ?? 0);
             $this->breakfastUnitPrice = (float) ($additionalMealTypes['Breakfast']['unit_price'] ?? 0);
-        } else {
-            $this->hasBreakfast = false;
-            $this->breakfastMaxQuantity = 0;
-            $this->breakfastUnitPrice = 0;
         }
 
         if (isset($additionalMealTypes['Lunch'])) {
             $this->hasLunch = true;
             $this->lunchMaxQuantity = (int) ($additionalMealTypes['Lunch']['max_quantity'] ?? 0);
             $this->lunchUnitPrice = (float) ($additionalMealTypes['Lunch']['unit_price'] ?? 0);
-        } else {
-            $this->hasLunch = false;
-            $this->lunchMaxQuantity = 0;
-            $this->lunchUnitPrice = 0;
         }
 
         if (isset($additionalMealTypes['Dinner'])) {
             $this->hasDinner = true;
             $this->dinnerMaxQuantity = (int) ($additionalMealTypes['Dinner']['max_quantity'] ?? 0);
             $this->dinnerUnitPrice = (float) ($additionalMealTypes['Dinner']['unit_price'] ?? 0);
-        } else {
-            $this->hasDinner = false;
-            $this->dinnerMaxQuantity = 0;
-            $this->dinnerUnitPrice = 0;
         }
 
         if (isset($additionalMealTypes['Salad'])) {
             $this->hasSalad = true;
             $this->saladMaxQuantity = (int) ($additionalMealTypes['Salad']['max_quantity'] ?? 0);
             $this->saladUnitPrice = (float) ($additionalMealTypes['Salad']['unit_price'] ?? 0);
-        } else {
-            $this->hasSalad = false;
-            $this->saladMaxQuantity = 0;
-            $this->saladUnitPrice = 0;
         }
 
         if (isset($additionalMealTypes['Snacks'])) {
             $this->hasSnacks = true;
             $this->snacksMaxQuantity = (int) ($additionalMealTypes['Snacks']['max_quantity'] ?? 0);
             $this->snacksUnitPrice = (float) ($additionalMealTypes['Snacks']['unit_price'] ?? 0);
-        } else {
-            $this->hasSnacks = false;
-            $this->snacksMaxQuantity = 0;
-            $this->snacksUnitPrice = 0;
         }
+
+        // ensure mealTypes is a collection for operations
+        $this->mealTypes = collect($this->mealTypes ?? []);
+
+        // sync mealTypes according to current quantities
+        $this->syncAllMealTypes();
+
+        // update totals
+        $this->updateTotals();
+
+        // finally keep mealTypes as plain array for Livewire serialization
+        $this->mealTypes = collect($this->mealTypes)->unique()->values()->all();
     }
 
     /**
@@ -167,10 +145,10 @@ trait AdditionalMeals
     {
         $map = [
             'breakfastQuantity' => 'Breakfast',
-            'lunchQuantity' => 'Lunch',
-            'dinnerQuantity' => 'Dinner',
-            'saladQuantity' => 'Salad',
-            'snacksQuantity' => 'Snacks',
+            'lunchQuantity'     => 'Lunch',
+            'dinnerQuantity'    => 'Dinner',
+            'saladQuantity'     => 'Salad',
+            'snacksQuantity'    => 'Snacks',
         ];
 
         foreach ($map as $prop => $typeName) {
@@ -207,10 +185,10 @@ trait AdditionalMeals
     protected function updateTotals(): void
     {
         $this->breakfastTotalPrice = $this->breakfastUnitPrice * (int) $this->breakfastQuantity;
-        $this->lunchTotalPrice = $this->lunchUnitPrice * (int) $this->lunchQuantity;
-        $this->dinnerTotalPrice = $this->dinnerUnitPrice * (int) $this->dinnerQuantity;
-        $this->saladTotalPrice = $this->saladUnitPrice * (int) $this->saladQuantity;
-        $this->snacksTotalPrice = $this->snacksUnitPrice * (int) $this->snacksQuantity;
+        $this->lunchTotalPrice     = $this->lunchUnitPrice * (int) $this->lunchQuantity;
+        $this->dinnerTotalPrice    = $this->dinnerUnitPrice * (int) $this->dinnerQuantity;
+        $this->saladTotalPrice     = $this->saladUnitPrice * (int) $this->saladQuantity;
+        $this->snacksTotalPrice    = $this->snacksUnitPrice * (int) $this->snacksQuantity;
 
         $this->totalAdditionalPrice = $this->breakfastTotalPrice
             + $this->lunchTotalPrice
@@ -256,21 +234,5 @@ trait AdditionalMeals
 
         // ensure mealTypes stored as array for Livewire serialization
         $this->mealTypes = collect($this->mealTypes)->unique()->values()->all();
-    }
-
-    /**
-     * Hydrate hook: refresh DB-driven config on each Livewire request without wiping user state.
-     * This keeps prices/max quantities up-to-date if admin changes them while user is on the page.
-     */
-    public function hydrate(): void
-    {
-        // refresh only config (unit prices, max quantities, flags)
-        $this->refreshAdditionalMealConfig();
-
-        // update totals in case unit prices changed
-        $this->updateTotals();
-
-        // ensure mealTypes remains serializable
-        $this->mealTypes = collect($this->mealTypes ?? [])->unique()->values()->all();
     }
 }

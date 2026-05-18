@@ -57,6 +57,33 @@
         </div>
     @endif
 
+    @if ($this->hasDinner)
+        <div
+            class="meal-row grid grid-cols-4 items-center gap-2 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 rounded-lg py-2 px-3">
+            <div class="col-span-2">
+                <div class="font-medium">Dinner</div>
+                <div class="text-xs text-slate-500">BHD {{ number_format($this->dinnerUnitPrice, 2) }}</div>
+            </div>
+
+            <div class="col-span-1 text-sm text-right">
+                <span class="text-slate-600">Max: {{ $this->dinnerMaxQuantity }}</span>
+            </div>
+
+            <div class="col-span-1">
+                <input type="number" wire:model.live.debounce.150ms="dinnerQuantity" min="0" max="{{ $this->dinnerMaxQuantity }}"
+                    step="1"
+                    class="w-full focus:outline-0 bg-white border border-slate-300 rounded-md py-1 px-2 font-bold" />
+            </div>
+
+
+            <div class="col-span-4 text-right text-sm mt-1 pr-2">
+                <span class="text-slate-600">Line total: </span>
+                <span class="line-total font-bold">BHD {{ number_format($this->dinnerTotalPrice, 2) }}</span>
+            </div>
+
+        </div>
+    @endif
+
     @if ($this->hasSalad)
         <div
             class="meal-row grid grid-cols-4 items-center gap-2 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 rounded-lg py-2 px-3">
@@ -79,6 +106,33 @@
             <div class="col-span-4 text-right text-sm mt-1 pr-2">
                 <span class="text-slate-600">Line total: </span>
                 <span class="line-total font-bold">BHD {{ number_format($this->saladTotalPrice, 2) }}</span>
+            </div>
+
+        </div>
+    @endif
+
+    @if ($this->hasSnacks)
+        <div
+            class="meal-row grid grid-cols-4 items-center gap-2 text-sm bg-gray-100 text-slate-700 border border-dotted border-gray-400 rounded-lg py-2 px-3">
+            <div class="col-span-2">
+                <div class="font-medium">Snacks</div>
+                <div class="text-xs text-slate-500">BHD {{ number_format($this->snacksUnitPrice, 2) }}</div>
+            </div>
+
+            <div class="col-span-1 text-sm text-right">
+                <span class="text-slate-600">Max: {{ $this->snacksMaxQuantity }}</span>
+            </div>
+
+            <div class="col-span-1">
+                <input type="number" wire:model.live.debounce.150ms="snacksQuantity" min="0" max="{{ $this->snacksMaxQuantity }}"
+                    step="1"
+                    class="w-full focus:outline-0 bg-white border border-slate-300 rounded-md py-1 px-2 font-bold" />
+            </div>
+
+
+            <div class="col-span-4 text-right text-sm mt-1 pr-2">
+                <span class="text-slate-600">Line total: </span>
+                <span class="line-total font-bold">BHD {{ number_format($this->snacksTotalPrice, 2) }}</span>
             </div>
 
         </div>

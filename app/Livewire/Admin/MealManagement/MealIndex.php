@@ -76,8 +76,8 @@ class MealIndex extends Component
     public $protein;
     public $carbs;
     public $fat;
-    public $fiber;
-    public $price;
+    public $fiber = 0;
+    public $price = 0;
     public $status;
     public $user_id;
     public $meal_type_id;
@@ -155,21 +155,21 @@ class MealIndex extends Component
     #[Computed]
     public function diet_plans()
     {
-        return DietPlan::latest()->get();
+        return DietPlan::orderBy('name', 'asc')->get(['id','name']);
     }
 
     // This function will
     #[Computed]
     public function meal_types()
     {
-        return MealType::latest()->get();
+        return MealType::orderBy('name', 'asc')->get(['id','name']);
     }
 
     // This function will
     #[Computed]
     public function ingredients()
     {
-        return Ingredient::latest()->get();
+        return Ingredient::orderBy('name', 'asc')->get(['id','name']);
     }
 
     public function render()
