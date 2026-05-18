@@ -276,7 +276,7 @@ class IngredientIndex extends Component
                 Ingredient::firstOrCreate([
                     'name' => $data['name'],
                     'slug' => Str::slug($data['name']),
-                    'description' => 'Healthy meal healthy calories',
+                    'description' => 'Healthy meal healthy calories.',
                     'user_id' => auth()->user()->id,
                 ]);
             }
