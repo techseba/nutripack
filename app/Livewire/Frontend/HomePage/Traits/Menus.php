@@ -64,7 +64,7 @@ trait Menus
     public function loadInitial()
     {
         $meals = Meal::where('is_guest_meal', true)
-            ->latest()
+            ->orderBy('name', 'asc')
             ->paginate($this->perPage);
 
         $this->meals = $meals->items();

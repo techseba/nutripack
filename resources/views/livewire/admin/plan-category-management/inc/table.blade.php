@@ -50,7 +50,7 @@
                                 alt="{{ $row->name }}">
                         @else
                             <img class="w-8 h-8 object-cover rounded-full"
-                                src="{{ asset('assets/logo.jpg') }}" alt="{{ $row->name }}">
+                                src="{{ asset('assets/healthymeal.webp') }}" alt="{{ $row->name }}">
                         @endif
                     </x-table.td>
                     <x-table.td>{!! highlight($row->name, $this->search) !!}</x-table.td>
