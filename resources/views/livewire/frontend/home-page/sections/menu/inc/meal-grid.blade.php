@@ -44,7 +44,7 @@
                     </div>
 
                     <!-- Content -->
-                    <div class="p-6 grow flex flex-col">
+                    <div class="py-6 px-4 grow flex flex-col">
                         <div class="flex justify-between items-start mb-2">
                             <h3
                                 class="font-bold text-slate-800 capitalize group-hover:text-emerald-500 transition-colors">
@@ -52,11 +52,11 @@
                         </div>
 
                         <a href="{{ route('meal.preview', $menu->id) }}" wire:navigate
-                            class="bg-amber-400 hover:bg-amber-500 transition-colors cursor-pointer text-slate-800 py-1.5 px-2 w-30 uppercase text-xs font-medium rounded-sm shadow-md">more
+                            class="text-center bg-amber-400 hover:bg-amber-500 transition-colors cursor-pointer text-slate-800 py-1.5 px-2 w-30 uppercase text-xs font-medium rounded-sm shadow-md">more
                             details</a>
 
                         <!-- Description -->
-                        <p class="text-slate-500 text-xs mt-3">{{ $menu->description }}</p>
+                        <p class="text-slate-500 text-xs mt-3">{{ $menu->description ? $menu->description : 'Healthy meal Healthy calories.' }}</p>
 
                         <!-- Nutrition Badges -->
                         <div class="mt-auto flex items-center justify-between">

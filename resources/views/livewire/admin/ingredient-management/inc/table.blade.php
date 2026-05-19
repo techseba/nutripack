@@ -48,7 +48,7 @@
                             <img class="w-8 h-8 object-cover rounded-full" src="{{ asset('storage/' . $row->image) }}"
                                 alt="{{ $row->name }}">
                         @else
-                            <div class="text-3xl">🦐</div>
+                            <div class="text-3xl">💧</div>
                         @endif
                     </x-table.td>
                     <x-table.td>{!! highlight($row->name, $this->search) !!}</x-table.td>

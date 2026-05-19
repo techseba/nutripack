@@ -28,7 +28,7 @@
                         class="px-3 py-1 bg-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-2 inline-block">{{ $meal->mealType->name }}</span>
                     <h2 class="text-2xl font-bold text-slate-900 first-letter:capitalize">{{ $meal->name }}</h2>
                 </div>
-                <p class="text-slate-600 leading-relaxed">{{ $meal->description }}</p>
+                <p class="text-slate-600 leading-relaxed">{{ $meal->description ? $meal->description : 'Healthy meal Healthy calories.' }}</p>
 
                 <div class="grid grid-cols-4 gap-2">
 
@@ -67,7 +67,7 @@
                                 @else
                                     <div
                                         class="inline-flex justify-center items-center w-10 h-10 m-auto bg-white border border-slate-400 rounded-full text-2xl">
-                                        🦐</div>
+                                        💧</div>
                                 @endif
                                 <p class="text-[10px] font-black text-slate-800 uppercase mb-1">
                                     {{ $ingredient->name }}
