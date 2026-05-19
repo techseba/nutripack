@@ -3,7 +3,7 @@
     modalOpen: false,
 }" class="max-w-md mx-auto min-h-screen bg-lemon text-slate-900 px-4 overflow-hidden">
 
-    @if (env('MAINTENANCE_MODE'))
+    @if (env('UNDER_DEVELOPMENT'))
         <div class="mt-4">
             <x-widget.marquee />
         </div>

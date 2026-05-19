@@ -142,7 +142,7 @@ class DayWiseMealIndex extends Component
     public function meals()
     {
         if ($this->mealTypeId) {
-            return Meal::where('meal_type_id', $this->mealTypeId)->latest()->get();
+            return Meal::where('meal_type_id', $this->mealTypeId)->orderBy('name', 'asc')->get();
         }
         return collect();
     }

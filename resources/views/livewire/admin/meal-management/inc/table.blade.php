@@ -17,8 +17,9 @@
                 <x-table.th class="w-15">ID</x-table.th>
                 <x-table.th class="w-10">image</x-table.th>
                 <x-table.th>name</x-table.th>
-                <x-table.th>slug</x-table.th>
-                <x-table.th>price</x-table.th>
+                <!--<x-table.th>slug</x-table.th>-->
+                <x-table.th>Diet Plan</x-table.th>
+                <!--<x-table.th>price</x-table.th>-->
                 <x-table.th>meal type</x-table.th>
                 <x-table.th>creator</x-table.th>
                 <x-table.th>status</x-table.th>
@@ -45,17 +46,22 @@
                     <x-table.td>{{ $row->id }}</x-table.td>
                     <x-table.td>
                         @if ($row->image)
-                            <img class="w-8 h-8 object-cover rounded-full mx-auto" src="{{ asset('storage/' . $row->image) }}"
-                                alt="{{ $row->name }}">
+                            <img class="w-8 h-8 object-cover rounded-full mx-auto"
+                                src="{{ asset('storage/' . $row->image) }}" alt="{{ $row->name }}">
                         @else
                             <div class="text-3xl">🍛</div>
                         @endif
                     </x-table.td>
-                    <x-table.td>{!! highlight($row->name, $this->search) !!}</x-table.td>
-                    <x-table.td>{!! highlight($row->slug, $this->search) !!}</x-table.td>
-                    <x-table.td>{{$row->price}}</x-table.td>
-                    <x-table.td>{{$row->mealType->name}}</x-table.td>
-                    <x-table.td>{{$row->user->name}}</x-table.td>
+                    <x-table.td title="{{ $row->slug }}">{!! highlight($row->name, $this->search) !!}</x-table.td>
+                    <!--<x-table.td>{!! highlight($row->slug, $this->search) !!}</x-table.td>-->
+                    <x-table.td>
+                        @foreach ($row->dietPlans as $dietPlan)
+                            <p class="text-xs">{{ $dietPlan->name }}</p>
+                        @endforeach
+                    </x-table.td>
+                    <!--<x-table.td>{{ $row->price }}</x-table.td>-->
+                    <x-table.td>{{ $row->mealType->name }}</x-table.td>
+                    <x-table.td>{{ $row->user->name }}</x-table.td>
                     <x-table.td>
                         <label class="relative inline-flex cursor-not-allowed items-center gap-3 text-gray-900">
                             <input disabled type="checkbox" class="peer sr-only"

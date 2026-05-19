@@ -44,7 +44,7 @@
     <main
         class="flex flex-col gap-10 items-center justify-center max-w-md mx-auto min-h-screen bg-lemon text-slate-900 px-4 overflow-hidden">
 
-        @if (env('MAINTENANCE_MODE'))
+        @if (env('UNDER_DEVELOPMENT'))
             <div class="w-full max-w-xl mx-auto">
                 <x-widget.marquee />
             </div>

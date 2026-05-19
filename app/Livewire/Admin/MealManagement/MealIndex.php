@@ -136,10 +136,11 @@ class MealIndex extends Component
     public function rowsQuery(): Builder
     {
         return Meal::query()
+            ->with('dietPlans')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name','like',"%{$this->search}%")
-                    ->orWhere('slug','like',"%{$this->search}%");
+                    ->orWhere('meal_type_id','like',"%{$this->search}%");
                 });
         })->latest();
     }
@@ -148,7 +149,7 @@ class MealIndex extends Component
     #[Computed]
     public function rows()
     {
-        return $this->rowsQuery->paginate($this->perPage);
+        return $this->rowsQuery()->paginate($this->perPage);
     }
 
     // This function will
