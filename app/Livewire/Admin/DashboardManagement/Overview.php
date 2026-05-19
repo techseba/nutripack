@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin\DashboardManagement;
 
 use App\Models\Meal;
+use App\Models\Plan;
 use App\Models\Subscriber;
+use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -13,7 +15,9 @@ use Spatie\Activitylog\Models\Activity;
 #[Layout('layouts::dashboard')]
 class Overview extends Component
 {
+    public $userCount;
     public $subscriberCount;
+    public $planCount;
     public $mealCount;
 
     // কত করে লোড হবে প্রতি চাংকে
@@ -37,7 +41,9 @@ class Overview extends Component
 
     public function refreshCount()
     {
+        $this->userCount = User::count();
         $this->subscriberCount = Subscriber::count();
+        $this->planCount = Plan::count();
         $this->mealCount = Meal::count();
     }
 

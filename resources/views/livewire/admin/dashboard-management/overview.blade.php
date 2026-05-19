@@ -61,6 +61,26 @@
             <!-- Stats Overview -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
 
+                {{-- User --}}
+                <div
+                    class="bg-white p-5 rounded-2xl border border-slate-200 shadow-md card-hover hover:bg-slate-200 hover:border-slate-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="p-2 rounded-lg">
+                            <i class="w-5 h-5 text-blue-500">
+                                <x-icons.users />
+                            </i>
+                        </div>
+                        <a href="{{ route('admin.subscribers') }}" wire:navigate
+                            class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
+                    </div>
+
+                    <div wire:poll.5000ms="refreshCount">
+                        <p class="text-2xl font-bold text-slate-900">{{ $userCount ?? '—' }}</p>
+                    </div>
+
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">users</p>
+                </div>
+
                 {{-- Subscribers --}}
                 <div
                     class="bg-white p-5 rounded-2xl border border-slate-200 shadow-md card-hover hover:bg-slate-200 hover:border-slate-300">
@@ -93,7 +113,7 @@
                         <a href="{{ route('admin.subscribers') }}" wire:navigate
                             class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-50 text-emerald-500"><x-icons.link /></a>
                     </div>
-                    <p class="text-2xl font-bold text-slate-900">{{ $subscriberCount }}</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ $planCount }}</p>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mt-1">Active Plans</p>
                 </div>
 

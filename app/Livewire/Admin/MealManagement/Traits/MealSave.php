@@ -86,7 +86,7 @@ trait MealSave
                 'name'        => ['required','string','max:40'],
                 'description' => ['nullable','string'],
 
-                'image' => ['nullable','image','mimes:jpg,jpeg,png','max:512'],
+                'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:512'],
 
                 'calories' => ['required','numeric'],
                 'protein'  => ['required','numeric'],
