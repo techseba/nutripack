@@ -88,7 +88,7 @@ class PackingReportIndex extends Component
             $user = $first->subscriber->user ?? null;
 
             // === এখানে পরিবর্তন: countBy() ব্যবহার করে সঠিক গণনা ===
-            $mealCounts = $group->pluck('meal.name')
+            $mealCounts = $group->pluck('meal.slug')
                 ->filter()            // remove nulls
                 ->countBy()           // returns Collection like ['Chicken' => 2, 'Rice' => 1]
                 ->toArray();

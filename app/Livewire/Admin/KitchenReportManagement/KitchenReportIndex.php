@@ -86,7 +86,7 @@ class KitchenReportIndex extends Component
             ->select(
                 't.id',
                 't.meal_id',
-                'meals.name as meal_name',
+                'meals.slug as meal_name',
                 'meal_types.name as meal_type_name',
                 't.date',
                 't.qty'

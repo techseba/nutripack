@@ -20,7 +20,7 @@
                     <x-table.td>
                         @foreach ($row->meal_names as $meal)
                             <div class="text-sm">
-                                {{ $meal }}
+                                {{ ucfirst(str_replace('-', '_', $meal)) }}
                             </div>
                         @endforeach
                     </x-table.td>

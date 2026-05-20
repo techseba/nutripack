@@ -12,7 +12,7 @@
             @forelse ($this->combinedRows as $row)
                 <x-table.tr>
                     <x-table.td><x-widget.date :value="$row->date" /></x-table.td>
-                    <x-table.td>{{ $row->meal_name }}</x-table.td>
+                    <x-table.td>{{ ucfirst(str_replace('-', '_', $row->meal_name)) }}</x-table.td>
                     <x-table.td>{{ $row->qty }}</x-table.td>
                     <x-table.td>{{ $row->meal_type_name }}</x-table.td>
                 </x-table.tr>

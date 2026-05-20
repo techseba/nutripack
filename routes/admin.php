@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\ActivityLogManagement\ActivityLogIndex;
 use App\Livewire\Admin\AdditionalMealManagement\AdditionalMealIndex;
 use App\Livewire\Admin\DashboardManagement\Overview;
 use App\Livewire\Admin\DayWiseMealManagement\DayWiseMealIndex;
@@ -28,6 +29,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->as('admin.')->group( f
     Route::get('permissions', PermissionIndex::class)->name('permissions');
     Route::get('roles', RoleIndex::class)->name('roles');
     Route::get('users', UserIndex::class)->name('users');
+    Route::get('activity-logs', ActivityLogIndex::class)->name('activity-logs');
 
     Route::get('diet-plans', DietPlanIndex::class)->name('diet-plans');
     Route::get('meal-types', MealTypeIndex::class)->name('meal-types');

@@ -95,7 +95,7 @@ public function deliveryRows(): Collection
         $user = $first->subscriber->user ?? null;
 
         // === Meal counting: countBy() gives correct counts per meal name ===
-        $mealCounts = $group->pluck('meal.name')
+        $mealCounts = $group->pluck('meal.slug')
             ->filter()            // remove nulls
             ->countBy()           // Collection: ['Chicken' => 2, 'Rice' => 1]
             ->toArray();

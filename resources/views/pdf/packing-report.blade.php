@@ -47,7 +47,7 @@
                     <td>{{ $row->subscriber_name }}</td>
                     <td>{{ $row->subscriber_phone }}</td>
                     <td class="meals">
-                        {{ implode(', ', $row->meal_names) }}
+                        {{ implode(', ', collect($row->meal_names)->map(fn($meal) => ucfirst(str_replace('-', '_', $meal)))->toArray()) }}
                     </td>
                     <td class="meals">
                         {{ implode(', ', $row->subscriber_allergens) }}

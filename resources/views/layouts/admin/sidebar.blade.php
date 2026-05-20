@@ -21,13 +21,11 @@
 
             <div class="md:hidden">
                 {{-- dashboard overview --}}
-                <flux:sidebar.item icon="home" :href="route('home')"
-                    :current="request()->routeIs('home')" wire:navigate>
+                <flux:sidebar.item icon="home" :href="route('home')" :current="request()->routeIs('home')"
+                    wire:navigate>
                     {{ __('Home') }}
                 </flux:sidebar.item>
             </div>
-
-            <flux:sidebar.group :heading="__('Platform')" class="grid">
 
                 @can('dashboard.view')
                     {{-- dashboard overview --}}
@@ -141,31 +139,46 @@
                     </flux:sidebar.item>
                 @endcan
 
-                @can('meal.view')
-                    {{-- day wise meals --}}
-                    <flux:sidebar.item icon="report" :href="route('admin.kitchen-report')"
-                        :current="request()->routeIs('admin.kitchen-report')" wire:navigate>
-                        {{ __('Kitchen Report') }}
-                    </flux:sidebar.item>
-                @endcan
+                {{-- Report Management --}}
+                <div x-data="{ open: false }">
+                    <button type="button" x-on:click="open = ! open"
+                        class="peer group w-full text-left px-4 pr-2 py-2 rounded text-sm text-zinc-400 font-bold shadow-sm hover:bg-zinc-800 focus:outline-none">
+                        <span>Report Management</span>
 
-                @can('meal.view')
-                    {{-- day wise meals --}}
-                    <flux:sidebar.item icon="report" :href="route('admin.packing-report')"
-                        :current="request()->routeIs('admin.packing-report')" wire:navigate>
-                        {{ __('Packing Report') }}
-                    </flux:sidebar.item>
-                @endcan
+                        <!-- :class ব্যবহার করে open ট্রু হলে rotate-0 এবং ফলস হলে -rotate-90 বা আপনার ইচ্ছেমত রোটেশন ক্লাস সেট করা হয়েছে -->
+                        <svg class="w-5 h-5 inline float-right transition-transform duration-200"
+                            :class="open ? 'rotate-0' : '-rotate-90'" xmlns="http://w3.org" fill="none"
+                            viewBox="0 0 24 24" stroke="#6B7280">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
+                        </svg>
+                    </button>
 
-                @can('meal.view')
-                    {{-- day wise meals --}}
-                    <flux:sidebar.item icon="report" :href="route('admin.delivery-report')"
-                        :current="request()->routeIs('admin.delivery-report')" wire:navigate>
-                        {{ __('Delivery Report') }}
-                    </flux:sidebar.item>
-                @endcan
+                    <div x-show="open">
+                        @can('meal.view')
+                            {{-- day wise meals --}}
+                            <flux:sidebar.item icon="report" :href="route('admin.kitchen-report')"
+                                :current="request()->routeIs('admin.kitchen-report')" wire:navigate>
+                                {{ __('Kitchen Report') }}
+                            </flux:sidebar.item>
+                        @endcan
 
-            </flux:sidebar.group>
+                        @can('meal.view')
+                            {{-- day wise meals --}}
+                            <flux:sidebar.item icon="report" :href="route('admin.packing-report')"
+                                :current="request()->routeIs('admin.packing-report')" wire:navigate>
+                                {{ __('Packing Report') }}
+                            </flux:sidebar.item>
+                        @endcan
+
+                        @can('meal.view')
+                            {{-- day wise meals --}}
+                            <flux:sidebar.item icon="report" :href="route('admin.delivery-report')"
+                                :current="request()->routeIs('admin.delivery-report')" wire:navigate>
+                                {{ __('Delivery Report') }}
+                            </flux:sidebar.item>
+                        @endcan
+                    </div>
+                </div>
 
         </flux:sidebar.nav>
 
@@ -173,33 +186,56 @@
 
 
         <flux:sidebar.nav>
-            <flux:sidebar.group :heading="__('User Management')" class="grid">
 
-                @can('user.view')
-                    {{-- users --}}
-                    <flux:sidebar.item icon="users" :href="route('admin.users')"
-                        :current="request()->routeIs('admin.users')" wire:navigate>
-                        {{ __('Manage Users') }}
-                    </flux:sidebar.item>
-                @endcan
+            {{-- User Management --}}
+            <div x-data="{ open: false }">
+                <button type="button" x-on:click="open = ! open"
+                    class="peer group w-full text-left px-4 pr-2 py-2 rounded font-bold text-sm text-zinc-400 shadow-sm hover:bg-zinc-800 focus:outline-none">
+                    <span>User Management</span>
 
-                @can('role.view')
-                    {{-- roles --}}
-                    <flux:sidebar.item icon="roles" :href="route('admin.roles')"
-                        :current="request()->routeIs('admin.roles')" wire:navigate>
-                        {{ __('Manage Roles') }}
-                    </flux:sidebar.item>
-                @endcan
+                    <!-- :class ব্যবহার করে open ট্রু হলে rotate-0 এবং ফলস হলে -rotate-90 বা আপনার ইচ্ছেমত রোটেশন ক্লাস সেট করা হয়েছে -->
+                    <svg class="w-5 h-5 inline float-right transition-transform duration-200"
+                        :class="open ? 'rotate-0' : '-rotate-90'" xmlns="http://w3.org" fill="none"
+                        viewBox="0 0 24 24" stroke="#6B7280">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" />
+                    </svg>
+                </button>
 
-                @can('permission.view')
-                    {{-- roles --}}
-                    <flux:sidebar.item icon="permissions" :href="route('admin.permissions')"
-                        :current="request()->routeIs('admin.permissions')" wire:navigate>
-                        {{ __('Manage Permissions') }}
-                    </flux:sidebar.item>
-                @endcan
+                <div x-show="open">
+                    @can('user.view')
+                        {{-- users --}}
+                        <flux:sidebar.item icon="users" :href="route('admin.users')"
+                            :current="request()->routeIs('admin.users')" wire:navigate>
+                            {{ __('Manage Users') }}
+                        </flux:sidebar.item>
+                    @endcan
 
-            </flux:sidebar.group>
+                    @can('role.view')
+                        {{-- roles --}}
+                        <flux:sidebar.item icon="roles" :href="route('admin.roles')"
+                            :current="request()->routeIs('admin.roles')" wire:navigate>
+                            {{ __('Manage Roles') }}
+                        </flux:sidebar.item>
+                    @endcan
+
+                    @can('permission.view')
+                        {{-- roles --}}
+                        <flux:sidebar.item icon="permissions" :href="route('admin.permissions')"
+                            :current="request()->routeIs('admin.permissions')" wire:navigate>
+                            {{ __('Manage Permissions') }}
+                        </flux:sidebar.item>
+                    @endcan
+
+                    @can('permission.view')
+                        {{-- roles --}}
+                        <flux:sidebar.item icon="permissions" :href="route('admin.activity-logs')"
+                            :current="request()->routeIs('admin.activity-logs')" wire:navigate>
+                            {{ __('Activity Logs') }}
+                        </flux:sidebar.item>
+                    @endcan
+                </div>
+            </div>
+
         </flux:sidebar.nav>
 
         <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />

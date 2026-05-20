@@ -42,7 +42,7 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($row->date)->setTimezone(config('app.timezone'))->format('d M Y') }}</td>
-                    <td>{{ $row->meal_name }}</td>
+                    <td>{{ ucfirst(str_replace('-', '_', $row->meal_name)) }}</td>
                     <td>{{ $row->qty }}</td>
                     <td>{{ $row->meal_type_name }}</td>
                 </tr>
