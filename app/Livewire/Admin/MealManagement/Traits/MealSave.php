@@ -36,7 +36,6 @@ trait MealSave
                     'required',
                     'string',
                     'max:60',
-                    Rule::unique('meals', 'slug')->ignore($meal->id),
                 ],
                 'description' => ['nullable', 'string'],
 
@@ -60,6 +59,14 @@ trait MealSave
                 'mealIngredients' => ['required', 'array', 'min:1'],
                 'mealIngredients.*' => ['exists:ingredients,id'],
             ]);
+
+            $slug = $this->slug;
+            $count = 1;
+
+            while (Meal::where('slug', $slug)->exists()) {
+                $slug = $this->name.'-'.$count++ .'_'. Str::slug($this->dietPlanForSlug);
+            }
+            $data['slug'] = $slug;
 
             // ✅ if new image uploaded
             if ($this->image) {
