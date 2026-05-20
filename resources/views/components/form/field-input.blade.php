@@ -3,6 +3,7 @@
     'type' => 'text',
     'id' => null,
     'model' => null,
+    'live' => false,
     'required' => null,
     'disabled' => false,
 ])
@@ -62,12 +63,23 @@
             </button>
         </div>
     @else
-        <input type="{{ $type }}" step="any" id="{{ $inputId }}"
-            @if ($model) wire:model.defer="{{ $model }}" @endif @if($disabled) disabled @endif
-            {{ $attributes->merge([
-                'class' => $baseClass . ' ' . ($errors->has($model) ? $errorClass : $normalClass),
-            ]) }} aria-label="{{ $label }}"
- />
+        @if ($live)
+            <input type="{{ $type }}" step="any" id="{{ $inputId }}"
+                @if ($model) wire:model.live.debounce.50ms="{{ $model }}" @endif
+                @if ($disabled) disabled @endif
+                {{ $attributes->merge([
+                    'class' => $baseClass . ' ' . ($errors->has($model) ? $errorClass : $normalClass),
+                ]) }}
+                aria-label="{{ $label }}" />
+        @else
+            <input type="{{ $type }}" step="any" id="{{ $inputId }}"
+                @if ($model) wire:model.defer="{{ $model }}" @endif
+                @if ($disabled) disabled @endif
+                {{ $attributes->merge([
+                    'class' => $baseClass . ' ' . ($errors->has($model) ? $errorClass : $normalClass),
+                ]) }}
+                aria-label="{{ $label }}" />
+        @endif
     @endif
 
     @error($model)

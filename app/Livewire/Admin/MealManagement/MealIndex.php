@@ -68,6 +68,7 @@ class MealIndex extends Component
     public ?int $editRow = null;
 
     public string $name = '';
+    public string $dietPlanForSlug = '';
     public string $slug = '';
     public string $description = '';
     public $image; // new upload

@@ -9,6 +9,16 @@ use Illuminate\Validation\Rule;
 
 trait MealSave
 {
+    public function updatedName()
+    {
+        $this->slug = $this->name;
+    }
+
+    public function updatedDietPlanForSlug()
+    {
+        $this->slug = $this->name.'_'. Str::slug($this->dietPlanForSlug);
+    }
+
     public function save()
     {
         // Sanitizing form data
@@ -20,37 +30,34 @@ trait MealSave
 
             $meal = Meal::findOrFail($this->editRow);
 
-            // ✅ Always slugify
-            $this->slug = Str::slug($this->slug);
-
             $data = $this->validate([
-                'name'        => ['required','string','max:40'],
-                'slug'              => [
+                'name' => ['required', 'string', 'max:40'],
+                'slug' => [
                     'required',
                     'string',
                     'max:60',
-                    Rule::unique('meals','slug')->ignore($meal->id),
+                    Rule::unique('meals', 'slug')->ignore($meal->id),
                 ],
-                'description' => ['nullable','string'],
+                'description' => ['nullable', 'string'],
 
-                'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:512'],
+                'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:512'],
 
-                'calories' => ['required','numeric'],
-                'protein'  => ['required','numeric'],
-                'carbs'    => ['required','numeric'],
-                'fat'      => ['required','numeric'],
-                'fiber'    => ['required','numeric'],
+                'calories' => ['required', 'numeric'],
+                'protein' => ['required', 'numeric'],
+                'carbs' => ['required', 'numeric'],
+                'fat' => ['required', 'numeric'],
+                'fiber' => ['required', 'numeric'],
 
-                'price' => ['nullable','decimal:0,2'],
+                'price' => ['nullable', 'decimal:0,2'],
 
-                'status'         =>  ['required','in:active,inactive'],
+                'status' => ['required', 'in:active,inactive'],
 
-                'meal_type_id' => ['required','exists:meal_types,id'],
+                'meal_type_id' => ['required', 'exists:meal_types,id'],
 
-                'mealDietPlans'      => ['required','array','min:1'],
-                'mealDietPlans.*'    => ['exists:diet_plans,id'],
+                'mealDietPlans' => ['required', 'array', 'min:1'],
+                'mealDietPlans.*' => ['exists:diet_plans,id'],
 
-                'mealIngredients'   => ['required','array','min:1'],
+                'mealIngredients' => ['required', 'array', 'min:1'],
                 'mealIngredients.*' => ['exists:ingredients,id'],
             ]);
 
@@ -61,10 +68,10 @@ trait MealSave
                     Storage::disk('public')->delete($meal->image);
                 }
 
-                $filename = Str::slug($this->name) . '-' . time() . '.' . $this->image->extension();
+                $filename = Str::slug($this->name).'-'.time().'.'.$this->image->extension();
 
                 $data['image'] = $this->image->storeAs('meals', $filename, 'public');
-            }else{
+            } else {
                 unset($data['image']);
             }
 
@@ -75,7 +82,7 @@ trait MealSave
             $meal->dietPlans()->sync($this->mealDietPlans);
             $meal->ingredients()->sync($this->mealIngredients);
 
-            $this->dispatch('toast', message: ucfirst($this->subject) . ' updated successfully', type: 'success');
+            $this->dispatch('toast', message: ucfirst($this->subject).' updated successfully', type: 'success');
 
         } else {
 
@@ -83,34 +90,38 @@ trait MealSave
 
             // Checking form validation
             $data = $this->validate([
-                'name'        => ['required','string','max:40'],
-                'description' => ['nullable','string'],
+                'name' => ['required', 'string', 'max:40'],
+                'slug' => [
+                    'required',
+                    'string',
+                    'max:60',
+                ],
+                'description' => ['nullable', 'string'],
 
-                'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:512'],
+                'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:512'],
 
-                'calories' => ['required','numeric'],
-                'protein'  => ['required','numeric'],
-                'carbs'    => ['required','numeric'],
-                'fat'      => ['required','numeric'],
-                'fiber'    => ['nullable','numeric'],
+                'calories' => ['required', 'numeric'],
+                'protein' => ['required', 'numeric'],
+                'carbs' => ['required', 'numeric'],
+                'fat' => ['required', 'numeric'],
+                'fiber' => ['nullable', 'numeric'],
 
-                'price' => ['nullable','decimal:0,2'],
+                'price' => ['nullable', 'decimal:0,2'],
 
-                'meal_type_id' => ['required','exists:meal_types,id'],
+                'meal_type_id' => ['required', 'exists:meal_types,id'],
 
-                'mealDietPlans'      => ['required','array','min:1'],
-                'mealDietPlans.*'    => ['exists:diet_plans,id'],
+                'mealDietPlans' => ['required', 'array', 'min:1'],
+                'mealDietPlans.*' => ['exists:diet_plans,id'],
 
-                'mealIngredients'   => ['required','array','min:1'],
+                'mealIngredients' => ['required', 'array', 'min:1'],
                 'mealIngredients.*' => ['exists:ingredients,id'],
             ]);
 
-            $slug = Str::slug($this->name);
-            $originalSlug = $slug;
+            $slug = $this->slug;
             $count = 1;
 
             while (Meal::where('slug', $slug)->exists()) {
-                $slug = $originalSlug . '-' . $count++;
+                $slug = $this->name.'-'.$count++ .'_'. Str::slug($this->dietPlanForSlug);
             }
             $data['slug'] = $slug;
 
@@ -118,7 +129,7 @@ trait MealSave
 
             // Store image
             if ($this->image) {
-                $filename = Str::slug($this->name) . '-' . time() . '.' . $this->image->extension();
+                $filename = Str::slug($this->name).'-'.time().'.'.$this->image->extension();
                 $data['image'] = $this->image->storeAs('meals', $filename, 'public');
             }
 
@@ -128,10 +139,10 @@ trait MealSave
             $meal->dietPlans()->sync($this->mealDietPlans);
             $meal->ingredients()->sync($this->mealIngredients);
 
-            activity()->causedBy(auth()->user())->withProperties(['describe'=> $meal->name . ' meal created successfully', 'ip'=>request()->ip()])->log('Meal created');
+            activity()->causedBy(auth()->user())->withProperties(['describe' => $meal->name.' meal created successfully', 'ip' => request()->ip()])->log('Meal created');
 
             // Notifying that a row has been successfully inserted into the database
-            $this->dispatch('toast', message: ucfirst($this->subject) . ' created successfully', type: 'success');
+            $this->dispatch('toast', message: ucfirst($this->subject).' created successfully', type: 'success');
         }
 
         // Resetting form fields

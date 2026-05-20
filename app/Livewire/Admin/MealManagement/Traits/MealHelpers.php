@@ -41,6 +41,7 @@ trait MealHelpers
                 'isEdit',
                 'editRow',
                 'name',
+                'dietPlanForSlug',
                 'slug',
                 'description',
                 'image',

@@ -2,10 +2,19 @@
 
     <div class="block lg:grid lg:grid-cols-4 gap-x-5 space-y-5 lg:space-y-0">
         <div class="col-span-3 space-y-5">
-            <x-form.field-input model="name" label="name" required />
-            @if ($isEdit)
-                <x-form.field-input model="slug" label="slug" required />
-            @endif
+            <x-form.field-input live model="name" label="name" required />
+
+            <div class="flex gap-4 text-sm text-zinc-200">
+                @foreach ($this->diet_plans as $diet_plan)
+                    <label>
+                        <input type="radio" wire:model.live="dietPlanForSlug" value="{{ $diet_plan->name }}">
+                        {{ $diet_plan->name }}
+                    </label>
+                @endforeach
+            </div>
+
+            <x-form.field-input model="slug" label="slug" required />
+
 
             <x-form.field-message model="description" label="description" />
             <div class="flex flex-col lg:flex-row gap-4">
