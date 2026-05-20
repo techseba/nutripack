@@ -15,7 +15,6 @@
 
             <x-form.field-input model="slug" label="slug" required />
 
-
             <x-form.field-message model="description" label="description" />
             <div class="flex flex-col lg:flex-row gap-4">
                 <x-form.field-input type="number" model="calories" label="calories" />
